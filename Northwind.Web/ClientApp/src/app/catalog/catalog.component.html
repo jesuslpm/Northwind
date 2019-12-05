@@ -1,0 +1,29 @@
+<h2>Catalog</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Category</th>
+      <th>Quantity per Unit</th>
+      <th>Unit Price</th>
+      <th>In stock</th>
+      <th>On order</th>
+      <th>Reorder Level</th>
+      <th>Discontinued</th>
+      <th>Supplier</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let p of products">
+      <td>{{p.productName}}</td>
+      <td>{{p.categoryName}}</td>
+      <td>{{p.quantityPerUnit}}</td>
+      <td>{{p.unitPrice}}</td>
+      <td>{{p.unitsInStock}}</td>
+      <td>{{p.unitsOnOrder}}</td>
+      <td>{{p.reorderLevel}}</td>
+      <td>{{p.discontinued}}</td>
+      <td>{{p.suplierName}}</td>
+    </tr>
+  </tbody> 
+</table>

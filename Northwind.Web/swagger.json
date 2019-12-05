@@ -1,0 +1,405 @@
+﻿{
+  "x-generator": "NSwag v13.1.6.0 (NJsonSchema v10.0.28.0 (Newtonsoft.Json v12.0.0.0))",
+  "swagger": "2.0",
+  "info": {
+    "title": "Northwind",
+    "version": "1.0.0"
+  },
+  "produces": [
+    "text/plain",
+    "application/json",
+    "text/json"
+  ],
+  "paths": {
+    "/catalog/products": {
+      "get": {
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "Returns all products in the catalog",
+        "operationId": "Catalog_GetProducts",
+        "responses": {
+          "200": {
+            "x-nullable": false,
+            "description": "a list of products",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Product"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/catalog/categories": {
+      "get": {
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "Returns all categories",
+        "operationId": "Catalog_GetCategories",
+        "responses": {
+          "200": {
+            "x-nullable": false,
+            "description": "a list of categories",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Category"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/orders": {
+      "get": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Returns an order including its order details",
+        "operationId": "Orders_GetWholeOrder",
+        "parameters": [
+          {
+            "type": "integer",
+            "name": "orderId",
+            "in": "query",
+            "required": true,
+            "format": "int32",
+            "x-nullable": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "x-nullable": false,
+            "description": "an order",
+            "schema": {
+              "$ref": "#/definitions/Order"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Saves an order including its order details",
+        "operationId": "Orders_SaveWholeOrder",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "parameters": [
+          {
+            "name": "order",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Order"
+            },
+            "x-nullable": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "x-nullable": false,
+            "description": "The order",
+            "schema": {
+              "$ref": "#/definitions/Order"
+            }
+          }
+        }
+      }
+    },
+    "/orders/search": {
+      "post": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Gets the order headers that meet the search criteria",
+        "operationId": "Orders_Search",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "parameters": [
+          {
+            "name": "searchCriteria",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/OrderCriteria"
+            },
+            "x-nullable": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "x-nullable": false,
+            "description": "The order",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Order"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/WeatherForecast": {
+      "get": {
+        "tags": [
+          "WeatherForecast"
+        ],
+        "operationId": "WeatherForecast_Get",
+        "responses": {
+          "200": {
+            "x-nullable": false,
+            "description": "",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/WeatherForecast"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Product": {
+      "type": "object",
+      "required": [
+        "productId",
+        "discontinued"
+      ],
+      "properties": {
+        "productId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "productName": {
+          "type": "string"
+        },
+        "supplierId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "categoryId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "quantityPerUnit": {
+          "type": "string"
+        },
+        "unitPrice": {
+          "type": "number",
+          "format": "decimal"
+        },
+        "unitsInStock": {
+          "type": "integer"
+        },
+        "unitsOnOrder": {
+          "type": "integer"
+        },
+        "reorderLevel": {
+          "type": "integer"
+        },
+        "discontinued": {
+          "type": "boolean"
+        },
+        "categoryName": {
+          "type": "string"
+        },
+        "suplierName": {
+          "type": "string"
+        }
+      }
+    },
+    "Category": {
+      "type": "object",
+      "required": [
+        "categoryId"
+      ],
+      "properties": {
+        "categoryId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "categoryName": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "picture": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "Order": {
+      "type": "object",
+      "required": [
+        "orderId"
+      ],
+      "properties": {
+        "orderId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "customerId": {
+          "type": "string"
+        },
+        "employeeId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "orderDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "requiredDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "shippedDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "shipVia": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "freight": {
+          "type": "number",
+          "format": "decimal"
+        },
+        "shipName": {
+          "type": "string"
+        },
+        "shipAddress": {
+          "type": "string"
+        },
+        "shipCity": {
+          "type": "string"
+        },
+        "shipRegion": {
+          "type": "string"
+        },
+        "shipPostalCode": {
+          "type": "string"
+        },
+        "shipCountry": {
+          "type": "string"
+        },
+        "customerCompanyName": {
+          "type": "string"
+        },
+        "employeeFirstName": {
+          "type": "string"
+        },
+        "employeeLastName": {
+          "type": "string"
+        },
+        "shipperCompanyName": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/OrderDetail"
+          }
+        }
+      }
+    },
+    "OrderDetail": {
+      "type": "object",
+      "required": [
+        "orderId",
+        "productId",
+        "unitPrice",
+        "quantity",
+        "discount"
+      ],
+      "properties": {
+        "orderId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "productId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "unitPrice": {
+          "type": "number",
+          "format": "decimal"
+        },
+        "quantity": {
+          "type": "integer"
+        },
+        "discount": {
+          "type": "number",
+          "format": "double"
+        },
+        "productName": {
+          "type": "string"
+        },
+        "lineTotal": {
+          "type": "number",
+          "format": "decimal"
+        }
+      }
+    },
+    "OrderCriteria": {
+      "type": "object",
+      "properties": {
+        "customerId": {
+          "type": "string"
+        },
+        "orderDateFrom": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "orderDateTo": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "employeeId": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "WeatherForecast": {
+      "type": "object",
+      "required": [
+        "date",
+        "temperatureC",
+        "temperatureF"
+      ],
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "temperatureC": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "temperatureF": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "summary": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

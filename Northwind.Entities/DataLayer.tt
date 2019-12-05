@@ -1,0 +1,72 @@
+﻿<#@ include file ="EntityLite.ttinclude\EntityLite.ttinclude" #>
+<#
+	var generation = new DataLayerGeneration
+	{
+		ProviderName = "System.Data.SqlClient",
+		UserSecretsId = "86512e78-2fd7-4884-be5f-0bcc8b47b70a",
+		ConnectionStringName= "Northwind",
+		DataServiceName = "NorthwindDataService",
+		DefaultSchema = "dbo",
+		RootNamespace = "Northwind.Entities",
+		GenerateAsyncMethods = true,
+		ImplementINotifyPropertyChanged = false,
+		GenerateTypeScript = false,
+		GenerateEntityTypeId = false,
+		EntityNameToEntityViewTransform = TextTransform.ToPascalNamingConvention,
+		AuditDateTimeKind = DateTimeKind.Utc,
+		JsonType = JsonType.JToken,
+		GenerateProjectionColumnLists = true,
+		EntitySettings = new List<EntitySetting>
+		{
+			new EntitySetting 
+			{
+                EntityName = "Product", 
+				BaseTableName = "Products"
+			},
+			new EntitySetting 
+			{
+                EntityName = "Order", 
+				BaseTableName = "Orders"
+			},
+			new EntitySetting 
+			{
+                EntityName = "OrderDetail", 
+				BaseTableName = "Order Details"
+			},
+			new EntitySetting 
+			{
+                EntityName = "Category", 
+				BaseTableName = "Categories"
+			},
+			new EntitySetting 
+			{
+                EntityName = "Customer", 
+				BaseTableName = "Customers"
+			},
+			new EntitySetting 
+			{
+                EntityName = "Employee", 
+				BaseTableName = "Employees"
+			},
+			new EntitySetting 
+			{
+                EntityName = "Shipper", 
+				BaseTableName = "Shippers"
+			},
+			new EntitySetting 
+			{
+                EntityName = "Supplier", 
+				BaseTableName = "Suppliers"
+			}
+		},
+		ProcedureSettings = new List<ProcedureSetting>
+		{
+		
+		},
+		EnumSettings = new List<EnumSetting>
+		{
+		
+		}
+	};
+	Render(generation);
+#>

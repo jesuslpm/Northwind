@@ -517,13 +517,14 @@ namespace Northwind.Entities
 		{
 			return ((IRepository<Order>)this).Get(projectionName, orderId, FetchMode.UseIdentityMap);
 		}
-
+        
 		public Order Get(string projectionName, Int32 orderId, FetchMode fetchMode = FetchMode.UseIdentityMap)
 		{
 			return ((IRepository<Order>)this).Get(projectionName, orderId, fetchMode);
 		}
 
-		public Order Get(Projection projection, Int32 orderId)
+
+        public Order Get(Projection projection, Int32 orderId)
 		{
 			return ((IRepository<Order>)this).Get(projection, orderId, FetchMode.UseIdentityMap);
 		}
@@ -738,7 +739,8 @@ namespace Northwind.Entities
 	{
 		public const string BaseTable = "BaseTable";
 		public const string Basic = "Basic";
-	}
+        public const string Advanced = "Advanced";
+    }
 	[Serializable]
 	[DataContract]
 	[SqlEntity(BaseTableName="Categories")]

@@ -2,7 +2,7 @@
 
 /* Provide sufficient contrast against white background */
 
-@font-face {
+/*@font-face {
   font-family: 'Quicksand';
   src:url('/assets/fonts/quicksand/static/Quicksand-Regular.ttf') format('truetype');
   font-weight: 300;
@@ -22,7 +22,7 @@
   font-family: 'Quicksand';
   src: url('/assets/fonts/quicksand/static/Quicksand-Bold.ttf') format('truetype');
         
-}
+}*/
 body{
   background: #f9f9f9;
   font-family: 'Quicksand', sans-serif;

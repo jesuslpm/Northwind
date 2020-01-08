@@ -47,5 +47,17 @@ namespace Northwind.Web.Controllers
                 .ToListAsync();
             return Ok(categories);
         }
+
+        /// <summary>
+        /// Returns all suppliers
+        /// </summary>
+        /// <returns>a list of suppliers</returns>
+        [HttpGet("suppliers")]
+        [ProducesResponseType(typeof(IList<Entities.Supplier>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetSuppliers()
+        {
+            var suppliers = await dataService.SupplierRepository.Query(SupplierProjections.BaseTable).ToListAsync();
+            return Ok(suppliers);
+        }
     }
 }

@@ -53,6 +53,27 @@
         }
       }
     },
+    "/catalog/suppliers": {
+      "get": {
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "Returns all suppliers",
+        "operationId": "Catalog_GetSuppliers",
+        "responses": {
+          "200": {
+            "x-nullable": false,
+            "description": "a list of suppliers",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Supplier"
+              }
+            }
+          }
+        }
+      }
+    },
     "/orders": {
       "get": {
         "tags": [
@@ -240,6 +261,51 @@
         "picture": {
           "type": "string",
           "format": "byte"
+        }
+      }
+    },
+    "Supplier": {
+      "type": "object",
+      "required": [
+        "supplierId"
+      ],
+      "properties": {
+        "supplierId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "companyName": {
+          "type": "string"
+        },
+        "contactName": {
+          "type": "string"
+        },
+        "contactTitle": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        },
+        "postalCode": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "fax": {
+          "type": "string"
+        },
+        "homePage": {
+          "type": "string"
         }
       }
     },

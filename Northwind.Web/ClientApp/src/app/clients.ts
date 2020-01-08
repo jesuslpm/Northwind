@@ -440,7 +440,6 @@ export interface Category {
     picture?: string | undefined;
 }
 
-
 export interface Supplier {
     supplierId: number;
     companyName?: string | undefined;

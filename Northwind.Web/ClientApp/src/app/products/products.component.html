@@ -1,0 +1,54 @@
+<div class="card upgraded mb-4 mb-md-5">    
+    <div class="card-header">
+        <h2 class="card-title">Products</h2>
+    </div>
+    <div class="card-body">
+<form [formGroup]="searchForm" (ngSubmit)="filterData()">
+    <div class="row">
+        <div class="col-sm-4">
+            <select id="supplier" name="supplier" formControlName="supplier" (change)="filterData()" class="form-control">
+                <option value="">Select Supplier</option>
+                <option *ngFor="let supplier of suppliers;" [value]="supplier.companyName" [ngClass]="{active: (supplier.companyName == searchForm.value.supplier)}">
+                    {{supplier.companyName}}
+                </option>
+            </select>
+        </div>
+        <div class="col-sm-4">
+            <select id="category" name="category" formControlName="category" (change)="filterData()" class="form-control">
+                <option value="">Select Category</option>
+                <option *ngFor="let category of categories;" [value]="category.categoryName" [ngClass]="{active: (category.categoryName == searchForm.value.category)}">
+                    {{category.categoryName}}
+                </option>
+            </select>
+        </div>
+    </div>
+</form>
+<br />
+<table id="sample-table" datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border upgraded table-bordered hover">
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Product Name</th>
+            <th>Supplier</th>
+            <th>Category</th>
+            <th>Unit Price</th>
+            <th>Discontinued</th>
+            <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let p of products">
+            <td>{{p.productId}}</td>
+            <td>{{p.productName}}</td>
+            <td>{{p.suplierName}}</td>
+            <td>{{p.categoryName}}</td>
+            <td>{{p.unitPrice | number : '1.2-2'}}</td>
+            <td>{{(p.discontinued == true)?'Yes':'No'}}</td>
+            <td>
+                <button class='btn btn-primary' (click)="openModal()">View</button>
+            </td>
+        </tr>
+      </tbody>
+</table>
+</div>
+</div>

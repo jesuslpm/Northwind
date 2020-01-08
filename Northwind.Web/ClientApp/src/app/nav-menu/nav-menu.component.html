@@ -4,6 +4,7 @@
   >
     <div class="container">
       <a class="navbar-brand" [routerLink]="['/']">Northwind</a>
+      
       <button
         class="navbar-toggler"
         type="button"
@@ -27,14 +28,19 @@
           >
             <a class="nav-link text-dark" [routerLink]="['/']">Home</a>
           </li>
-          <li class="nav-item" [routerLinkActive]="['link-active']">
+          <!-- <li class="nav-item" [routerLinkActive]="['link-active']">
             <a class="nav-link text-dark" [routerLink]="['/catalog']"
               >Catalog</a
             >
-          </li>
+          </li> -->
           <li class="nav-item" [routerLinkActive]="['link-active']">
             <a class="nav-link text-dark" [routerLink]="['/orders']"
               >Orders</a
+            >
+          </li>
+          <li class="nav-item" [routerLinkActive]="['link-active']">
+            <a class="nav-link text-dark" [routerLink]="['/products']"
+              >Products</a
             >
           </li>
         </ul>

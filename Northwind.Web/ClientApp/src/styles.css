@@ -1,6 +1,33 @@
 /* You can add global styles to this file, and also import other style files */
 
 /* Provide sufficient contrast against white background */
+
+@font-face {
+  font-family: 'Quicksand';
+  src:url('/assets/fonts/quicksand/static/Quicksand-Regular.ttf') format('truetype');
+  font-weight: 300;
+}
+@font-face {
+  font-family: 'Quicksand';
+  font-weight: 400;
+  src:  url('/assets/fonts/quicksand/static/Quicksand-Medium.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Quicksand';
+  font-weight: 500;
+  src: url('/assets/fonts/quicksand/static/Quicksand-SemiBold.ttf') format('truetype');
+}
+@font-face {
+  font-weight: 600;
+  font-family: 'Quicksand';
+  src: url('/assets/fonts/quicksand/static/Quicksand-Bold.ttf') format('truetype');
+        
+}
+body{
+  background: #f9f9f9;
+  font-family: 'Quicksand', sans-serif;
+}
+
 a {
   color: #0366d6;
 }
@@ -14,3 +41,129 @@ code {
   background-color: #1b6ec2;
   border-color: #1861ac;
 }
+
+option.active {
+  font-weight: bold;
+}
+/****************/
+.card.upgraded {
+  border: none;
+  box-shadow: 0px 2px 28px -6px #ddd;
+  border-radius: 0px;
+}
+.card.upgraded .card-header{
+  background: none;
+}
+
+.card.upgraded .card-body, .card.upgraded .card-header,.card.upgraded .card-footer {
+  padding: 1.3rem 2rem;
+}
+.card.upgraded .card-header .card-title {
+  margin: 0;
+  font-size: 24px;
+}
+.navbar-brand {
+  margin: 0;
+  padding: 0;
+  font-size: 30px;
+  font-weight: 800;  
+}
+.navbar-light .navbar-nav .nav-link{
+  font-weight: 500;
+  color: #999 !important; 
+  transition: 0.3s;
+}
+.navbar-light .navbar-nav .nav-link:hover{
+  color: #000000 !important;
+}
+button.dt-button {
+  background: rgba(26, 110, 194, .15);
+  border: 1px solid rgba(26, 110, 194, .1);
+  padding: 10px 20px ;
+  line-height: 1 ;
+  color: #555 !important;
+}
+
+button.dt-button:active,
+button.dt-button:focus,
+button.dt-button:hover {
+  background: rgba(26, 110, 194, .2) !important;
+  border:1px solid rgba(26, 110, 194, .1) !important;
+  box-shadow:none !important;
+  color: #212121 !important;
+}
+.form-control {
+  border-color: #ddd;
+}
+input[type="search"] {
+  border: 1px solid #ddd;
+  padding: 8px 13px;
+  line-height: 1;
+  font-size: 14px;
+}
+table.upgraded.dataTable{border:none;}
+table.upgraded.dataTable thead th, table.upgraded.dataTable tbody td {
+  padding: 12px 16px;
+  font-size: 14px;
+  border-color: #eee;
+  border-bottom:none;
+  border-right:none;
+}
+table.upgraded.dataTable thead tr th:last-child, table.upgraded.dataTable tbody tr td:last-child {
+border-right: 1px solid #eee; 
+}
+
+table.upgraded .btn.btn-primary {
+    font-size: 12px;
+    line-height: 1;
+    padding: 6px 15px;
+    border-radius: 3px;
+}
+
+table.upgraded.dataTable thead th {
+    white-space: nowrap;
+}
+.btn.btn-primary {
+  background: #03A9F4;
+  border-color: #03A9F4;
+}
+.btn.btn-primary:active,
+.btn.btn-primary:focus{
+  background: #079ee2 !important;
+  border-color: #079ee2 !important;
+  box-shadow: none !important;
+}
+
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    color: #aaa !important;
+    font-size: 14px;
+    margin: 0 4px;
+    padding: 8px 11px;
+    line-height: 1;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:active,
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:focus,
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover,
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background: #00a9f4;
+    border-color: #00a9f4;
+    color: #fff !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background: rgba(0,0,0,0.05);
+    color: #555 !important;
+    border-color: rgba(0,0,0,0.05);
+}
+.dataTables_wrapper .dataTables_info {
+  font-size: 14px;
+  color: #777;
+}
+.btn{
+  font-size: 14px;
+  padding: 12px 18px;line-height: 1;
+}
+
+/****************/

@@ -13,6 +13,7 @@ import { Injectable, Inject, Optional, InjectionToken } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpResponse, HttpResponseBase } from '@angular/common/http';
 
 export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
+import { environment } from './../environments/environment';
 
 @Injectable()
 export class CatalogClient {
@@ -30,7 +31,7 @@ export class CatalogClient {
      * @return a list of products
      */
     getProducts(): Observable<Product[]> {
-        let url_ = this.baseUrl + "/catalog/products";
+        let url_ = environment.BASE_URL + "/catalog/products";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -81,7 +82,7 @@ export class CatalogClient {
      * @return a list of categories
      */
     getCategories(): Observable<Category[]> {
-        let url_ = this.baseUrl + "/catalog/categories";
+        let url_ = environment.BASE_URL + "/catalog/categories";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -125,6 +126,59 @@ export class CatalogClient {
             }));
         }
         return _observableOf<Category[]>(<any>null);
+    }
+
+    /**
+     * Returns all suppliers
+     * @return a list of suppliers
+     */
+    getSuppliers(): Observable<Supplier[]> {
+        let url_ = environment.BASE_URL + "/catalog/suppliers";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",			
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetSuppliers(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetSuppliers(<any>response_);
+                } catch (e) {
+                    return <Observable<Supplier[]>><any>_observableThrow(e);
+                }
+            } else{
+                return <Observable<Supplier[]>><any>_observableThrow(response_);
+            }
+                
+        }));
+    }
+
+    protected processGetSuppliers(response: HttpResponseBase): Observable<Supplier[]> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : <Category[]>JSON.parse(_responseText, this.jsonParseReviver);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<Supplier[]>(<any>null);
     }
 }
 
@@ -384,6 +438,22 @@ export interface Category {
     categoryName?: string | undefined;
     description?: string | undefined;
     picture?: string | undefined;
+}
+
+
+export interface Supplier {
+    supplierId: number;
+    companyName?: string | undefined;
+    contactName?: string | undefined;
+    contactTitle?: string | undefined;
+    address?: string | undefined;
+    city?: string | undefined;
+    region?: string | undefined;
+    postalCode?: string | undefined;
+    country?: string | undefined;
+    phone?: string | undefined;
+    fax?: string | undefined;
+    homePage?: string | undefined;
 }
 
 export interface Order {

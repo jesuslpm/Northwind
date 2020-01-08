@@ -1,31 +1,9 @@
 /* You can add global styles to this file, and also import other style files */
 
 /* Provide sufficient contrast against white background */
-
-@font-face {
-  font-family: 'Quicksand';
-  src:url('/assets/fonts/quicksand/static/Quicksand-Regular.ttf') format('truetype');
-  font-weight: 300;
-}
-@font-face {
-  font-family: 'Quicksand';
-  font-weight: 400;
-  src:  url('/assets/fonts/quicksand/static/Quicksand-Medium.ttf') format('truetype');
-}
-@font-face {
-  font-family: 'Quicksand';
-  font-weight: 500;
-  src: url('/assets/fonts/quicksand/static/Quicksand-SemiBold.ttf') format('truetype');
-}
-@font-face {
-  font-weight: 600;
-  font-family: 'Quicksand';
-  src: url('/assets/fonts/quicksand/static/Quicksand-Bold.ttf') format('truetype');
-        
-}
 body{
   background: #f9f9f9;
-  font-family: 'Quicksand', sans-serif;
+  font-family: sans-serif;
 }
 
 a {

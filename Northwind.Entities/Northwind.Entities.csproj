@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <UserSecretsId>86512e78-2fd7-4884-be5f-0bcc8b47b70a</UserSecretsId>
     <RootNamespace>Northwind.Entities</RootNamespace>
   </PropertyGroup>

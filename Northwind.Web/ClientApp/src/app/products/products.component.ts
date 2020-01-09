@@ -149,7 +149,7 @@ export class ProductsComponent implements OnInit, OnDestroy,AfterViewInit {
   }
 
   openProductModal(template: TemplateRef<any>, productId) {
-    this.client.getProductDetail(productId)
+    this.client.getProductById(productId)
         .subscribe((product) => {
           if(product != null) {
             this.currentProduct = product;

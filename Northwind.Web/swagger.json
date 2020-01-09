@@ -32,6 +32,34 @@
         }
       }
     },
+    "/catalog/products/{productId}": {
+      "get": {
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "Product by Id",
+        "operationId": "Catalog_GetProductById",
+        "parameters": [
+          {
+            "type": "integer",
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "format": "int32",
+            "x-nullable": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "x-nullable": false,
+            "description": "Product By Id",
+            "schema": {
+              "$ref": "#/definitions/Product"
+            }
+          }
+        }
+      }
+    },
     "/catalog/categories": {
       "get": {
         "tags": [
@@ -233,6 +261,18 @@
         },
         "discontinued": {
           "type": "boolean"
+        },
+        "totalSold": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "usaSold": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "otherCountrySold": {
+          "type": "integer",
+          "format": "int32"
         },
         "categoryName": {
           "type": "string"

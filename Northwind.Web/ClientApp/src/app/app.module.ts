@@ -15,8 +15,9 @@ import { CatalogClient, OrdersClient } from './clients';
 import { ProductsComponent } from './products/products.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { DataTablesModule } from 'angular-datatables';
-import { BlockUIModule } from 'ng-block-ui';
 import { ToastrModule } from 'ngx-toastr';
+import { BlockUIModule } from 'ng-block-ui';
+import { ModalModule } from 'ngx-bootstrap/modal';
 @NgModule({
   declarations: [
     AppComponent,
@@ -41,6 +42,7 @@ import { ToastrModule } from 'ngx-toastr';
     BrowserAnimationsModule,
     ToastrModule.forRoot(),
     BlockUIModule.forRoot(),
+    ModalModule.forRoot(),
   ],
   providers: [
     CatalogClient,

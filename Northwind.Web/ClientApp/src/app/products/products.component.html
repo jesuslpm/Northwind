@@ -2,53 +2,160 @@
     <div class="card-header">
         <h2 class="card-title">Products</h2>
     </div>
-    <div class="card-body">
-<form [formGroup]="searchForm" (ngSubmit)="filterData()">
-    <div class="row">
-        <div class="col-sm-4">
-            <select id="supplier" name="supplier" formControlName="supplier" (change)="filterData()" class="form-control">
-                <option value="">Select Supplier</option>
-                <option *ngFor="let supplier of suppliers;" [value]="supplier.companyName" [ngClass]="{active: (supplier.companyName == searchForm.value.supplier)}">
-                    {{supplier.companyName}}
-                </option>
-            </select>
-        </div>
-        <div class="col-sm-4">
-            <select id="category" name="category" formControlName="category" (change)="filterData()" class="form-control">
-                <option value="">Select Category</option>
-                <option *ngFor="let category of categories;" [value]="category.categoryName" [ngClass]="{active: (category.categoryName == searchForm.value.category)}">
-                    {{category.categoryName}}
-                </option>
-            </select>
+    <div class="card-body position-relative">
+        <form [formGroup]="searchForm" (ngSubmit)="filterData()">
+            <div class="row">
+                <div class="col-sm-4">
+                    <select id="supplier" name="supplier" formControlName="supplier" (change)="filterData()" class="form-control">
+                        <option value="">Select Supplier</option>
+                        <option *ngFor="let supplier of suppliers;" [value]="supplier.companyName" [ngClass]="{active: (supplier.companyName == searchForm.value.supplier)}">
+                            {{supplier.companyName}}
+                        </option>
+                    </select>
+                </div>
+                <div class="col-sm-4">
+                    <select id="category" name="category" formControlName="category" (change)="filterData()" class="form-control">
+                        <option value="">Select Category</option>
+                        <option *ngFor="let category of categories;" [value]="category.categoryName" [ngClass]="{active: (category.categoryName == searchForm.value.category)}">
+                            {{category.categoryName}}
+                        </option>
+                    </select>
+                </div>
+            </div>
+        </form>
+        <br />
+        <div class='product-table'>
+        <table id="sample-table" datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border upgraded table-bordered hover">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Product Name</th>
+                    <th>Supplier</th>
+                    <th>Category</th>
+                    <th>Unit Price</th>
+                    <th>Discontinued</th>
+                    <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let p of products">
+                    <td>{{p.productId}}</td>
+                    <td>{{p.productName}}</td>
+                    <td>{{p.suplierName}}</td>
+                    <td>{{p.categoryName}}</td>
+                    <td class="text-right">$ {{p.unitPrice | number : '1.2-2'}}</td>
+                    <td>{{(p.discontinued == true)?'Yes':'No'}}</td>
+                    <td>
+                        <button class='btn btn-primary' (click)="openProductModal(productTemplate,p.productId)">View</button>
+                    </td>
+                </tr>
+              </tbody>
+        </table>
         </div>
     </div>
-</form>
-<br />
-<table id="sample-table" datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border upgraded table-bordered hover">
-    <thead>
-        <tr>
-            <th>Product</th>
-            <th>Product Name</th>
-            <th>Supplier</th>
-            <th>Category</th>
-            <th>Unit Price</th>
-            <th>Discontinued</th>
-            <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let p of products">
-            <td>{{p.productId}}</td>
-            <td>{{p.productName}}</td>
-            <td>{{p.suplierName}}</td>
-            <td>{{p.categoryName}}</td>
-            <td>{{p.unitPrice | number : '1.2-2'}}</td>
-            <td>{{(p.discontinued == true)?'Yes':'No'}}</td>
-            <td>
-                <button class='btn btn-primary' (click)="openModal()">View</button>
-            </td>
-        </tr>
-      </tbody>
-</table>
 </div>
-</div>
+
+<ng-template #productTemplate>
+    <div class="modal-header">
+        <h4 class="modal-title pull-left">{{currentProduct.productId}} - {{currentProduct.productName}}</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+            <span aria-hidden="true" title="close">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <form class="form-horizontal" [formGroup]="productForm">
+            <div class="container">
+                <div class="row">
+                    <div class="form-group col-sm-12">
+                        <div class="row">
+                            <label for="suplierName" class="col-sm-3 col-form-label">Supplier</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="suplierName" name="suplierName" formControlName="suplierName" disabled>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group col-sm-12">
+                        <div class="row">
+                            <label for="categoryId" class="col-sm-3 col-form-label">Category</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="categoryId" name="categoryId" formControlName="categoryId" disabled>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-sm col-sm-12">
+                        <div class="row">
+                            <label for="quantityPerUnit" class="col-sm-3 col-form-label">Quantity</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="quantityPerUnit" name="quantityPerUnit" formControlName="quantityPerUnit" disabled>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-sm col-sm-12">
+                        <div class="row">
+                            <label for="unitPrice" class="col-sm-3 col-form-label">Unit Price</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="unitPrice" [value]="productForm.get('unitPrice').value | number : '1.2-2' | currency" name="quantityPerUnit" formControlName="unitPrice" disabled>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-sm col-sm-12">
+                        <div class="row">
+                            <label for="unitsInStock" class="col-sm-3 col-form-label">Stock</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="unitsInStock" name="unitsInStock" formControlName="unitsInStock" disabled>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-sm col-sm-12">
+                        <div class="row">
+                            <label for="discontinued" class="col-sm-3 col-form-label">Discontinued</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="discontinued" name="discontinued" formControlName="discontinued" disabled>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-sm col-sm-12 product-card-outer">
+                        <div class="row">
+                            <div class="col-sm-5 general-stats">
+                                General Stats
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="card bg-light mb-3 product-card">
+                                    <div class="card-header">Total Units Sold</div>
+                                    <div class="card-body">
+                                      <h5 class="card-text text-center">{{currentProduct.totalSold}}</h5>
+                                    </div>
+                                  </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="card bg-light mb-3 product-card">
+                                    <div class="card-header">United States</div>
+                                    <div class="card-body">
+                                      <h5 class="card-text text-center">{{currentProduct.usaSold}}</h5>
+                                    </div>
+                                  </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="card bg-light mb-3 product-card">
+                                    <div class="card-header">Other Countries</div>
+                                    <div class="card-body">
+                                      <h5 class="card-text text-center">{{currentProduct.otherCountrySold}}</h5>
+                                    </div>
+                                  </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-sm col-sm-12">
+                        <div class="row">
+                            <div class="col-md-3 offset-5">
+                                <button type="button" class="btn btn-primary" aria-label="Close" (click)="modalRef.hide()">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>    
+    </div>    
+</ng-template>

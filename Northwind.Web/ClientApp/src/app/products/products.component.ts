@@ -3,7 +3,9 @@ import { CatalogClient, Product, Category, Supplier } from '../clients';
 import { Subject } from 'rxjs';
 import { DataTableDirective } from 'angular-datatables';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { ToastrService } from 'ngx-toastr';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-products',
@@ -20,37 +22,54 @@ export class ProductsComponent implements OnInit, OnDestroy,AfterViewInit {
   @ViewChild(DataTableDirective,{static: false}) datatableElement: DataTableDirective;
   searchForm: FormGroup;
   productForm: FormGroup;
+  modalRef: BsModalRef;
   currentProduct: Product;
 
   constructor(
     private client: CatalogClient,
     private fb: FormBuilder,
+    private modalService: BsModalService,
     private toastr: ToastrService
   ) { }
 
   ngOnInit() {
-      this.dtOptions = {
-          pagingType: 'full_numbers',
-          pageLength: 10,
-      };
+    this.dtOptions = {
+      pagingType: 'full_numbers',
+      pageLength: 10,
+      dom: 'lBfrtip',
+      buttons: [
+        {
+          extend: 'excel',
+          text: 'Export to Excel',
+          exportOptions: {
+            columns: [ 0, 1,2,3,4,5]
+          },
+          filename: function(){
+            var d = new Date();
+            var n = d.getTime();
+            return 'Products-' + moment(d).format('DD-MM-YYYY-HH:mm:ss');
+          }
+        }
+      ],
+    };
 
-      this.getProducts();
-      this.getCategories();
-      this.getSuppliers();
+    this.getProducts();
+    this.getCategories();
+    this.getSuppliers();
 
-      this.searchForm = this.fb.group({
-            supplier: [''],
-            category: ['']
-      });
-      
-      this.productForm = this.fb.group({
-        suplierName: [''],
-        categoryId: [''],
-        quantityPerUnit: [''],
-        unitPrice: [''],
-        unitsInStock: [''],
-        discontinued: [''],
-      });
+    this.searchForm = this.fb.group({
+          supplier: [''],
+          category: ['']
+    });
+    
+    this.productForm = this.fb.group({
+      suplierName: [''],
+      categoryId: [''],
+      quantityPerUnit: [''],
+      unitPrice: [''],
+      unitsInStock: [''],
+      discontinued: [''],
+    });
   }
 
   ngAfterViewInit(): void {
@@ -129,7 +148,26 @@ export class ProductsComponent implements OnInit, OnDestroy,AfterViewInit {
     });
   }
 
-  openModal() {
+  openProductModal(template: TemplateRef<any>, productId) {
+    this.client.getProductDetail(productId)
+        .subscribe((product) => {
+          if(product != null) {
+            this.currentProduct = product;
+            this.productForm.patchValue({
+              suplierName: product.suplierName,
+              categoryId: product.categoryName,
+              quantityPerUnit: product.quantityPerUnit,
+              unitPrice: product.unitPrice,
+              unitsInStock: product.unitsInStock,
+              discontinued: (product.discontinued == true)?'Yes':'No'
+            });
+            this.modalRef = this.modalService.show(template, {class: 'modal-lg right-side-modal product-modal'});
+          } else {
+            this.toastr.error('Something went wrong!', 'Error!');      
+          }
+      },(err) => {
+        this.toastr.error('Something went wrong!', 'Error!');
+      });
   }
 
   ngOnDestroy(): void {

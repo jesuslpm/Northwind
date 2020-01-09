@@ -138,6 +138,42 @@ namespace Northwind.Entities
 			}
         }
 
+		private Int32? _totalSold;
+		[DataMember]
+		[SqlField(DbType.Int32, 4, Precision = 10, AllowNull = true, ColumnName ="TotalSold" )]		
+		public Int32? TotalSold 
+		{ 
+		    get { return _totalSold; } 
+			set 
+			{
+			    _totalSold = value;
+			}
+        }
+
+		private Int32? _usaSold;
+		[DataMember]
+		[SqlField(DbType.Int32, 4, Precision = 10, AllowNull = true, ColumnName ="USASold" )]		
+		public Int32? UsaSold 
+		{ 
+		    get { return _usaSold; } 
+			set 
+			{
+			    _usaSold = value;
+			}
+        }
+
+		private Int32? _otherCountrySold;
+		[DataMember]
+		[SqlField(DbType.Int32, 4, Precision = 10, AllowNull = true, ColumnName ="OtherCountrySold" )]		
+		public Int32? OtherCountrySold 
+		{ 
+		    get { return _otherCountrySold; } 
+			set 
+			{
+			    _otherCountrySold = value;
+			}
+        }
+
 		private String _categoryName;
 		[DataMember]
 		[SqlField(DbType.String, 15, ColumnName ="CategoryName" )]		
@@ -163,7 +199,8 @@ namespace Northwind.Entities
         }
 
 		public const string BaseTableProjectionColumnList = "[ProductID], [ProductName], [SupplierID], [CategoryID], [QuantityPerUnit], [UnitPrice], [UnitsInStock], [UnitsOnOrder], [ReorderLevel], [Discontinued]";
-		public const string BasicProjectionColumnList = "[ProductID], [ProductName], [SupplierID], [CategoryID], [QuantityPerUnit], [UnitPrice], [UnitsInStock], [UnitsOnOrder], [ReorderLevel], [Discontinued], [CategoryName], [SuplierName]";
+		public const string BasicProjectionColumnList = "[ProductID], [ProductName], [SupplierID], [CategoryID], [QuantityPerUnit], [UnitPrice], [UnitsInStock], [UnitsOnOrder], [ReorderLevel], [Discontinued], [TotalSold], [USASold], [OtherCountrySold], [CategoryName], [SuplierName]";
+		public const string StatesProjectionColumnList = "[ProductID], [USASold], [OtherCountrySold], [TotalSold]";
 
 	}
 
@@ -266,6 +303,9 @@ namespace Northwind.Entities
 		public const string UnitsOnOrder = "UnitsOnOrder";
 		public const string ReorderLevel = "ReorderLevel";
 		public const string Discontinued = "Discontinued";
+		public const string TotalSold = "TotalSold";
+		public const string UsaSold = "UsaSold";
+		public const string OtherCountrySold = "OtherCountrySold";
 		public const string CategoryName = "CategoryName";
 		public const string SuplierName = "SuplierName";
 	}
@@ -274,6 +314,7 @@ namespace Northwind.Entities
 	{
 		public const string BaseTable = "BaseTable";
 		public const string Basic = "Basic";
+		public const string States = "States";
 	}
 	[Serializable]
 	[DataContract]
@@ -517,14 +558,13 @@ namespace Northwind.Entities
 		{
 			return ((IRepository<Order>)this).Get(projectionName, orderId, FetchMode.UseIdentityMap);
 		}
-        
+
 		public Order Get(string projectionName, Int32 orderId, FetchMode fetchMode = FetchMode.UseIdentityMap)
 		{
 			return ((IRepository<Order>)this).Get(projectionName, orderId, fetchMode);
 		}
 
-
-        public Order Get(Projection projection, Int32 orderId)
+		public Order Get(Projection projection, Int32 orderId)
 		{
 			return ((IRepository<Order>)this).Get(projection, orderId, FetchMode.UseIdentityMap);
 		}
@@ -739,8 +779,7 @@ namespace Northwind.Entities
 	{
 		public const string BaseTable = "BaseTable";
 		public const string Basic = "Basic";
-        public const string Advanced = "Advanced";
-    }
+	}
 	[Serializable]
 	[DataContract]
 	[SqlEntity(BaseTableName="Categories")]

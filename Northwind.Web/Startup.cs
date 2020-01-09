@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Northwind.Entities;
+using System;
 
 namespace Northwind.Web
 {
@@ -77,6 +78,7 @@ namespace Northwind.Web
 
                 if (env.IsDevelopment())
                 {
+                    spa.Options.StartupTimeout = new TimeSpan(0, 5, 0);
                     spa.UseAngularCliServer(npmScript: "start");
                 }
             });

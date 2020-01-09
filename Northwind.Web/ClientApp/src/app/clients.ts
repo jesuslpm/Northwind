@@ -22,7 +22,7 @@ export class CatalogClient {
 
     constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
         this.http = http;
-        this.baseUrl = baseUrl ? baseUrl : "http://192.168.1.173";
+        this.baseUrl = this.baseUrl = baseUrl ? baseUrl : "";
     }
 
     /**
@@ -241,7 +241,7 @@ export class OrdersClient {
 
     constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
         this.http = http;
-        this.baseUrl = baseUrl ? baseUrl : "http://192.168.1.173";
+        this.baseUrl = this.baseUrl = baseUrl ? baseUrl : "";
     }
 
     /**
@@ -469,7 +469,7 @@ export class WeatherForecastClient {
 
     constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
         this.http = http;
-        this.baseUrl = baseUrl ? baseUrl : "http://192.168.1.173";
+        this.baseUrl = this.baseUrl = baseUrl ? baseUrl : "";
     }
 
     get(): Observable<WeatherForecast[]> {

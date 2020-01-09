@@ -9,5 +9,8 @@ namespace Northwind.Entities
     {
         [DataMember]
         public IList<OrderDetail> Details { get; set; }
+
+        [DataMember]
+        public string EmployeeFullName => EmployeeFirstName + " " + EmployeeLastName;
     }
 }

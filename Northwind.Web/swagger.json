@@ -162,6 +162,27 @@
         }
       }
     },
+    "/orders/getallorders": {
+      "get": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Returns All Orders",
+        "operationId": "Orders_GetAllOrders",
+        "responses": {
+          "200": {
+            "x-nullable": false,
+            "description": "an order",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Order"
+              }
+            }
+          }
+        }
+      }
+    },
     "/orders/search": {
       "post": {
         "tags": [
@@ -416,11 +437,30 @@
         "shipperCompanyName": {
           "type": "string"
         },
+        "orderTotal": {
+          "type": "number",
+          "format": "double"
+        },
+        "shipTitle": {
+          "type": "string"
+        },
+        "shipPhone": {
+          "type": "string"
+        },
+        "shipFax": {
+          "type": "string"
+        },
+        "customerName": {
+          "type": "string"
+        },
         "details": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/OrderDetail"
           }
+        },
+        "employeeFullName": {
+          "type": "string"
         }
       }
     },

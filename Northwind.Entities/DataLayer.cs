@@ -200,7 +200,6 @@ namespace Northwind.Entities
 
 		public const string BaseTableProjectionColumnList = "[ProductID], [ProductName], [SupplierID], [CategoryID], [QuantityPerUnit], [UnitPrice], [UnitsInStock], [UnitsOnOrder], [ReorderLevel], [Discontinued]";
 		public const string BasicProjectionColumnList = "[ProductID], [ProductName], [SupplierID], [CategoryID], [QuantityPerUnit], [UnitPrice], [UnitsInStock], [UnitsOnOrder], [ReorderLevel], [Discontinued], [TotalSold], [USASold], [OtherCountrySold], [CategoryName], [SuplierName]";
-		public const string StatesProjectionColumnList = "[ProductID], [USASold], [OtherCountrySold], [TotalSold]";
 
 	}
 
@@ -314,7 +313,6 @@ namespace Northwind.Entities
 	{
 		public const string BaseTable = "BaseTable";
 		public const string Basic = "Basic";
-		public const string States = "States";
 	}
 	[Serializable]
 	[DataContract]
@@ -537,8 +535,69 @@ namespace Northwind.Entities
 			}
         }
 
+		private Double? _orderTotal;
+		[DataMember]
+		[SqlField(DbType.Double, 8, Precision = 15, AllowNull = true, IsReadOnly = true, ColumnName ="OrderTotal" )]		
+		public Double? OrderTotal 
+		{ 
+		    get { return _orderTotal; } 
+			set 
+			{
+			    _orderTotal = value;
+			}
+        }
+
+		private String _shipTitle;
+		[DataMember]
+		[SqlField(DbType.String, 30, ColumnName ="ShipTitle" )]		
+		public String ShipTitle 
+		{ 
+		    get { return _shipTitle; } 
+			set 
+			{
+			    _shipTitle = value;
+			}
+        }
+
+		private String _shipPhone;
+		[DataMember]
+		[SqlField(DbType.String, 24, ColumnName ="ShipPhone" )]		
+		public String ShipPhone 
+		{ 
+		    get { return _shipPhone; } 
+			set 
+			{
+			    _shipPhone = value;
+			}
+        }
+
+		private String _shipFax;
+		[DataMember]
+		[SqlField(DbType.String, 24, ColumnName ="ShipFax" )]		
+		public String ShipFax 
+		{ 
+		    get { return _shipFax; } 
+			set 
+			{
+			    _shipFax = value;
+			}
+        }
+
+		private String _customerName;
+		[DataMember]
+		[SqlField(DbType.String, 30, ColumnName ="CustomerName" )]		
+		public String CustomerName 
+		{ 
+		    get { return _customerName; } 
+			set 
+			{
+			    _customerName = value;
+			}
+        }
+
 		public const string BaseTableProjectionColumnList = "[OrderID], [CustomerID], [EmployeeID], [OrderDate], [RequiredDate], [ShippedDate], [ShipVia], [Freight], [ShipName], [ShipAddress], [ShipCity], [ShipRegion], [ShipPostalCode], [ShipCountry]";
-		public const string BasicProjectionColumnList = "[OrderID], [CustomerID], [EmployeeID], [OrderDate], [RequiredDate], [ShippedDate], [ShipVia], [Freight], [ShipName], [ShipAddress], [ShipCity], [ShipRegion], [ShipPostalCode], [ShipCountry], [CustomerCompanyName], [EmployeeFirstName], [EmployeeLastName], [ShipperCompanyName]";
+		public const string BasicProjectionColumnList = "[OrderID], [CustomerID], [EmployeeID], [OrderDate], [RequiredDate], [ShippedDate], [ShipVia], [Freight], [ShipName], [ShipAddress], [ShipCity], [ShipRegion], [ShipPostalCode], [ShipCountry], [CustomerCompanyName], [EmployeeFirstName], [EmployeeLastName], [ShipperCompanyName], [OrderTotal], [ShipTitle], [ShipPhone], [ShipFax]";
+		public const string WithTotalProjectionColumnList = "[OrderID], [CustomerID], [EmployeeID], [OrderDate], [RequiredDate], [ShippedDate], [ShipVia], [Freight], [ShipName], [ShipAddress], [ShipCity], [ShipRegion], [ShipPostalCode], [ShipCountry], [CustomerName], [EmployeeFirstName], [EmployeeLastName], [OrderTotal]";
 
 	}
 
@@ -649,12 +708,18 @@ namespace Northwind.Entities
 		public const string EmployeeFirstName = "EmployeeFirstName";
 		public const string EmployeeLastName = "EmployeeLastName";
 		public const string ShipperCompanyName = "ShipperCompanyName";
+		public const string OrderTotal = "OrderTotal";
+		public const string ShipTitle = "ShipTitle";
+		public const string ShipPhone = "ShipPhone";
+		public const string ShipFax = "ShipFax";
+		public const string CustomerName = "CustomerName";
 	}
 
 	public static partial class OrderProjections
 	{
 		public const string BaseTable = "BaseTable";
 		public const string Basic = "Basic";
+		public const string WithTotal = "WithTotal";
 	}
 	[Serializable]
 	[DataContract]

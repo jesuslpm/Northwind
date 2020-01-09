@@ -32,6 +32,17 @@ namespace Northwind.Web.Controllers
             return Ok(order);
         }
 
+        /// <summary>
+        /// Returns All Orders
+        /// </summary>
+        /// <returns>an order</returns> 
+        [HttpGet("getallorders")]
+        [ProducesResponseType(typeof(IList<Entities.Order>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAllOrders()
+        {
+            var orders = await dataService.OrderRepository.Query(OrderProjections.WithTotal).ToListAsync();
+            return Ok(orders);
+        }
 
         /// <summary>
         /// Saves an order including its order details

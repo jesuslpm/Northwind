@@ -1,5 +1,5 @@
 ﻿{
-  "runtime": "NetCore30",
+  "runtime": "NetCore31",
   "defaultVariables": "configuration=Debug",
   "documentGenerator": {
     "aspNetCoreToOpenApi": {
@@ -50,11 +50,11 @@
       "outputType": "Swagger2",
       "assemblyConfig": null,
       "assemblyPaths": [
-        "bin/$(Configuration)/netcoreapp3.0/Northwind.Web.dll"
+        "bin/$(Configuration)/netcoreapp3.1/Northwind.Web.dll"
       ],
       "referencePaths": [
-        "bin/$(Configuration)/netcoreapp3.0/",
-        "bin/$(Configuration)/netcoreapp3.0/References"
+        "bin/$(Configuration)/netcoreapp3.1/",
+        "bin/$(Configuration)/netcoreapp3.1/References"
       ],
       "useNuGetCache": false
     }

@@ -73,3 +73,212 @@
         </div>
     </div>
 </div>
+<ng-template #advanceSearchTemplate>
+    <div class="modal-header">
+        <h4 class="modal-title pull-left">Advance Search</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <form class="form-horizontal" [formGroup]="advanceSearchForm" (ngSubmit)="advanceSearchSubmit()">
+            <div class="container">
+                <div class="row">
+                    <div class="form-group col-sm-12">
+                        <div class="row">
+                            <label for="customer" class="col-sm-3 col-form-label">Customer</label>
+                            <div class="col-sm-9">
+                                <select id="customerIds" name="customerIds" formControlName="customerIds" class="form-control"
+                                    multiple>
+                                    <option value="">Customer</option>
+                                    <option *ngFor="let customer of customers;" [value]="customer.customerId">
+                                        {{customer.contactName}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group col-sm-12">
+                        <div class="row">
+                            <label for="employeeIds" class="col-sm-3 col-form-label">Employee</label>
+                            <div class="col-sm-9">
+                                <select id="employeeIds" name="employeeIds" formControlName="employeeIds" class="form-control"
+                                    multiple>
+                                    <option value="">Employee</option>
+                                    <option *ngFor="let employee of employees;" [value]="employee.employeeId">
+                                        {{employee.employeeFullName}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group col-sm-12">
+                        <div class="row">
+                            <label for="shipperIds" class="col-sm-3 col-form-label">Shipper</label>
+                            <div class="col-sm-9">
+                                <select id="shipperIds" name="shipperIds" formControlName="shipperIds" class="form-control"
+                                    multiple>
+                                    <option value="">Shipper</option>
+                                    <option *ngFor="let shipper of shippers;" [value]="shipper.companyName">
+                                        {{shipper.companyName}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group col-sm-12">
+                        <div class="row">
+                            <label for="shipper" class="col-sm-3 col-form-label">Product</label>
+                            <div class="col-sm-9">
+                                <select id="productIds" name="productIds" formControlName="productIds" class="form-control"
+                                    multiple>
+                                    <option value="">Product</option>
+                                    <option *ngFor="let product of products;" [value]="product.productId">
+                                        {{product.productName}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group col-sm-12">
+                        <div class="row">
+                            <label for="categoryId" class="col-sm-3 col-form-label">Order Amount</label>
+                            <div class="col-sm-1">
+                                <label for="categoryId" class="col-form-label">From</label>
+                            </div>
+                            <div class="col-sm-3">
+                                <input type="number" placeholder="" formControlName="orderAmountFrom"
+                                    class="form-control" (change)="onOrderAmountFromChange()">
+                            </div>
+                            <div class="col-sm-1">
+                                <label for="categoryId" class="col-form-label">To</label>
+                            </div>
+                            <div class="col-sm-3">
+                                <input type="number" placeholder="" formControlName="orderAmountTo"
+                                    class="form-control" (change)="onOrderAmountToChange()">
+                                <div *ngIf="advanceSearchForm.hasError('invalidSearchAmountTo')" class="validation-error">
+                                    Order amount to should not be greater than Order amount from.
+                                </div>
+                                <div *ngIf="advanceSearchForm.controls.orderAmountTo?.errors?.required"
+                                    class="validation-error">
+                                    This field is required
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group col-sm-12">
+                        <div class="row">
+                            <label for="categoryId" class="col-sm-3 col-form-label">Order Date</label>
+                            <div class="col-sm-1">
+                                <label for="categoryId" class="col-form-label">From</label>
+                            </div>
+                            <div class="col-sm-3">
+                                <input type="text" placeholder="dd/mm/yyyy" formControlName="orderDateFrom"
+                                    class="form-control" bsDatepicker
+                                    [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', adaptivePosition: true }"
+                                    (bsValueChange)="onOrderDateFromChange($event)">
+                                <div *ngIf="advanceSearchForm.controls.orderDateFrom?.errors?.required"
+                                    class="validation-error">
+                                    This field is required
+                                </div>
+                            </div>
+                            <div class="col-sm-1">
+                                <label for="categoryId" class="col-form-label">To</label>
+                            </div>
+                            <div class="col-sm-3">
+                                <input type="text" placeholder="dd/mm/yyyy" formControlName="orderDateTo"
+                                    class="form-control" bsDatepicker
+                                    [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', adaptivePosition: true }"
+                                    (bsValueChange)="onOrderDateToChange($event)" [minDate]="minOrderDateTo"
+                                    [isDisabled]="isDisabledOrderDateTo">
+                                <div *ngIf="advanceSearchForm.controls.orderDateTo?.errors?.required"
+                                    class="validation-error">
+                                    This field is required
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group col-sm-12">
+                        <div class="row">
+                            <label for="categoryId" class="col-sm-3 col-form-label">Required Date</label>
+                            <div class="col-sm-1">
+                                <label for="categoryId" class="col-form-label">From</label>
+                            </div>
+                            <div class="col-sm-3">
+                                <input type="text" placeholder="dd/mm/yyyy" formControlName="requiredDateFrom"
+                                    class="form-control" bsDatepicker
+                                    [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', adaptivePosition: true }"
+                                    (bsValueChange)="onRequiredDateFromChange($event)">
+                                <div *ngIf="advanceSearchForm.controls.requiredDateFrom?.errors?.required"
+                                    class="validation-error">
+                                    This field is required
+                                </div>
+                            </div>
+                            <div class="col-sm-1">
+                                <label for="categoryId" class="col-form-label">To</label>
+                            </div>
+                            <div class="col-sm-3">
+                                <input type="text" placeholder="dd/mm/yyyy" formControlName="requiredDateTo"
+                                    class="form-control" bsDatepicker
+                                    [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', adaptivePosition: true }"
+                                    (bsValueChange)="onRequiredDateToChange($event)" [minDate]="minRequiredDateTo"
+                                    [isDisabled]="isDisabledRequiredDateTo">
+                                <div *ngIf="advanceSearchForm.controls.requiredDateTo?.errors?.required"
+                                    class="validation-error">
+                                    This field is required
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group col-sm-12">
+                        <div class="row">
+                            <label for="categoryId" class="col-sm-3 col-form-label">Shipped Date</label>
+                            <div class="col-sm-1">
+                                <label for="categoryId" class="col-form-label">From</label>
+                            </div>
+                            <div class="col-sm-3">
+                                <input type="text" placeholder="dd/mm/yyyy" formControlName="shippedDateFrom"
+                                    class="form-control" bsDatepicker
+                                    [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', adaptivePosition: true }"
+                                    (bsValueChange)="onShippedDateFromChange($event)">
+                                <div *ngIf="advanceSearchForm.controls.shippedDateFrom?.errors?.required"
+                                    class="validation-error">
+                                    This field is required
+                                </div>
+                            </div>
+                            <div class="col-sm-1">
+                                <label for="categoryId" class="col-form-label">To</label>
+                            </div>
+                            <div class="col-sm-3">
+                                <input type="text" placeholder="dd/mm/yyyy" formControlName="shippedDateTo"
+                                    class="form-control" bsDatepicker
+                                    [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', adaptivePosition: true }"
+                                     (bsValueChange)="onShippedDateToChange($event)" [minDate]="minShippedDateTo"
+                                    [isDisabled]="isDisabledShippedDateTo">
+                                <div *ngIf="advanceSearchForm.controls.shippedDateTo?.errors?.required"
+                                    class="validation-error">
+                                    This field is required
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group form-group-sm col-sm-12">
+                        <div class="row">
+                            <div class="col-sm-3"></div>
+                            <div class="col-md-9">
+                                <button type="submit" class="btn btn-primary">Search</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </form>
+    </div>
+</ng-template>

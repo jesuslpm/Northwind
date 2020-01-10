@@ -11,9 +11,7 @@ import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { HomeComponent } from './home/home.component';
 import { CatalogComponent } from './catalog/catalog.component';
 import { OrdersComponent } from './orders/orders.component';
-import { CatalogClient, 
-  OrdersClient, CustomersClient
-} from './clients';
+import { CatalogClient, OrdersClient,CustomersClient, EmployeesClient} from './clients';
 import { ProductsComponent } from './products/products.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { DataTablesModule } from 'angular-datatables';
@@ -51,6 +49,7 @@ import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
   providers: [
     CatalogClient,
     OrdersClient,
+    EmployeesClient,
     CustomersClient,
     {
       provide: HTTP_INTERCEPTORS,

@@ -22,7 +22,7 @@ export class CatalogClient {
 
     constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
         this.http = http;
-        this.baseUrl = this.baseUrl = baseUrl ? baseUrl : "";
+        this.baseUrl = baseUrl ? baseUrl : "";
     }
 
     /**
@@ -241,7 +241,7 @@ export class OrdersClient {
 
     constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
         this.http = http;
-        this.baseUrl = this.baseUrl = baseUrl ? baseUrl : "";
+        this.baseUrl = baseUrl ? baseUrl : "";
     }
 
     /**
@@ -469,7 +469,7 @@ export class WeatherForecastClient {
 
     constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
         this.http = http;
-        this.baseUrl = this.baseUrl = baseUrl ? baseUrl : "";
+        this.baseUrl = baseUrl ? baseUrl : "";
     }
 
     get(): Observable<WeatherForecast[]> {
@@ -594,6 +594,7 @@ export interface OrderDetail {
     unitPrice: number;
     quantity: number;
     discount: number;
+    orderDetailId: number;
     productName?: string | undefined;
     lineTotal?: number | undefined;
 }

@@ -1,8 +1,39 @@
 <div class="card upgraded">
     <div class="card-header">
-        <div class="row">
-            <div class="col">
+        <div class="d-flex flex-wrap">
+            <div class="">
                 <h2 class="card-title">Orders</h2>
+            </div>
+            <div class="px-3 flex-1 mx-auto">
+                <form class="form-inline row" [formGroup]="searchForm" (ngSubmit)="searchFormSubmit()">           
+                    <div class="col">
+                        <div class="form-group">
+                        <input type="text" class="form-control" formControlName="orderId" placeholder="Order Id" id="orderId">
+                    </div>
+                    </div>
+                    <div class="col"><div class="form-group">
+                        <select id="customer" name="customerIds" formControlName="customerIds" class="form-control">
+                            <option value="">Customer Name</option>
+                            <option *ngFor="let customer of customers;" [value]="customer.customerId">
+                                {{customer.contactName}}
+                            </option>
+                        </select>
+                    </div>
+                    </div>
+                    <div class="col"><div class="form-group">
+                        <input type="text" placeholder="dd/mm/yyyy" formControlName="orderDateFrom"
+                                    class="form-control" bsDatepicker
+                                    [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', adaptivePosition: true }">
+                    </div>
+                    </div>                  
+                    <div class="col">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+            <div class="text-right">
+                <button class='btn btn-primary ml-3'
+                    (click)="openAdvanceSearchModal(advanceSearchTemplate)">Advance Search</button>
             </div>
         </div>
     </div>
@@ -29,13 +60,12 @@
                         <td>{{o.customerName}}</td>
                         <td>{{o.employeeFullName}}</td>
                         <td>{{o.shipName}}</td>
-                        <td>{{o.orderDate | date:'dd/MM/yyyy'}}</td>
-                        <td>{{o.requiredDate | date:'dd/MM/yyyy'}}</td>
-                        <td>{{o.shippedDate | date:'dd/MM/yyyy'}}</td>
+                        <td><span class='predate'>{{o.orderDate| date:'yyyy/MM/dd'}}</span>{{o.orderDate | date:'dd/MM/yyyy'}}</td>
+                        <td><span class='predate'>{{o.requiredDate| date:'yyyy/MM/dd'}}</span>{{o.requiredDate | date:'dd/MM/yyyy'}}</td>
+                        <td><span class='predate'>{{o.shippedDate| date:'yyyy/MM/dd'}}</span>{{o.shippedDate | date:'dd/MM/yyyy'}}</td>
                         <td class="text-right">$ {{o.orderTotal | number : '1.2-2'}}</td>
                         <td>
-                            <button class='btn btn-primary'
-                                (click)="openOrderModal(createOrderTemplate, true, o.orderId)">Edit</button>
+                            <button class='btn btn-primary pointer-none'>Edit</button>
                         </td>
                     </tr>
                 </tbody>

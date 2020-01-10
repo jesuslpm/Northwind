@@ -35,6 +35,14 @@ code {
   transform: translate3d(25%, 0, 0);
 }
 
+.datepicker {
+  z-index:1151 !important;
+}
+
+.validation-error {
+  color: red;
+}
+
 datatable-header, datatable-body, datatable-footer{
   width: auto !important;
 }
@@ -257,4 +265,12 @@ table.upgraded.dataTable {
 
 .nav-item:last-child a{
     padding-right:0 !important;
+}
+
+.pointer-none {
+  pointer-events: none;
+}
+
+.predate {
+  display: none;
 }

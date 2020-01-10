@@ -48,7 +48,7 @@ namespace Northwind.Web
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseCors(options => options.AllowAnyOrigin());
+            app.UseCors(builder => builder.WithOrigins("http://localhost:4200").AllowAnyHeader().AllowAnyMethod());
             if (!env.IsDevelopment())
             {
                 app.UseSpaStaticFiles();

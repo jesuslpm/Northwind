@@ -102,6 +102,75 @@
         }
       }
     },
+    "/customers/getallcustomers": {
+      "get": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "Returns Customers List",
+        "operationId": "Customers_GetAllCustomers",
+        "responses": {
+          "200": {
+            "x-nullable": false,
+            "description": "Customer List",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Customer"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/customers": {
+      "get": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "Return Customer By Id",
+        "operationId": "Customers_CustomerById",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "customerId",
+            "in": "query",
+            "required": true,
+            "x-nullable": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "x-nullable": false,
+            "description": "Customer Detail",
+            "schema": {
+              "$ref": "#/definitions/Customer"
+            }
+          }
+        }
+      }
+    },
+    "/employees/getallemployees": {
+      "get": {
+        "tags": [
+          "Employees"
+        ],
+        "summary": "Returns Employee List",
+        "operationId": "Employees_GetAllEmployees",
+        "responses": {
+          "200": {
+            "x-nullable": false,
+            "description": "Employee List",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/EmployeeMinimal"
+              }
+            }
+          }
+        }
+      }
+    },
     "/orders": {
       "get": {
         "tags": [
@@ -372,6 +441,59 @@
         }
       }
     },
+    "Customer": {
+      "type": "object",
+      "properties": {
+        "customerId": {
+          "type": "string"
+        },
+        "companyName": {
+          "type": "string"
+        },
+        "contactName": {
+          "type": "string"
+        },
+        "contactTitle": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        },
+        "postalCode": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "fax": {
+          "type": "string"
+        }
+      }
+    },
+    "EmployeeMinimal": {
+      "type": "object",
+      "required": [
+        "employeeId"
+      ],
+      "properties": {
+        "employeeId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "employeeFullName": {
+          "type": "string"
+        }
+      }
+    },
     "Order": {
       "type": "object",
       "required": [
@@ -512,8 +634,15 @@
     "OrderCriteria": {
       "type": "object",
       "properties": {
-        "customerId": {
-          "type": "string"
+        "customerIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "orderId": {
+          "type": "integer",
+          "format": "int32"
         },
         "orderDateFrom": {
           "type": "string",
@@ -523,9 +652,50 @@
           "type": "string",
           "format": "date-time"
         },
-        "employeeId": {
-          "type": "integer",
-          "format": "int32"
+        "employeeIds": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "shipperIds": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "productIds": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "orderAmountFrom": {
+          "type": "number",
+          "format": "decimal"
+        },
+        "orderAmountTo": {
+          "type": "number",
+          "format": "decimal"
+        },
+        "requiredDateFrom": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "requiredDateTo": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "shippedDateFrom": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "shippedDateTo": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },

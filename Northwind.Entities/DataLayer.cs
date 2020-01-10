@@ -728,7 +728,7 @@ namespace Northwind.Entities
 	{
 		private Int32 _orderId;
 		[DataMember]
-		[SqlField(DbType.Int32, 4, Precision = 10, IsKey=true, ColumnName ="OrderID", BaseColumnName ="OrderID", BaseTableName = "Order Details" )]		
+		[SqlField(DbType.Int32, 4, Precision = 10, ColumnName ="OrderID", BaseColumnName ="OrderID", BaseTableName = "Order Details" )]		
 		public Int32 OrderId 
 		{ 
 		    get { return _orderId; } 
@@ -740,7 +740,7 @@ namespace Northwind.Entities
 
 		private Int32 _productId;
 		[DataMember]
-		[SqlField(DbType.Int32, 4, Precision = 10, IsKey=true, ColumnName ="ProductID", BaseColumnName ="ProductID", BaseTableName = "Order Details" )]		
+		[SqlField(DbType.Int32, 4, Precision = 10, ColumnName ="ProductID", BaseColumnName ="ProductID", BaseTableName = "Order Details" )]		
 		public Int32 ProductId 
 		{ 
 		    get { return _productId; } 
@@ -786,6 +786,18 @@ namespace Northwind.Entities
 			}
         }
 
+		private Int32 _orderDetailId;
+		[DataMember]
+		[SqlField(DbType.Int32, 4, Precision = 10, IsKey=true, IsAutoincrement=true, IsReadOnly = true, ColumnName ="OrderDetailID", BaseColumnName ="OrderDetailID", BaseTableName = "Order Details" )]		
+		public Int32 OrderDetailId 
+		{ 
+		    get { return _orderDetailId; } 
+			set 
+			{
+			    _orderDetailId = value;
+			}
+        }
+
 		private String _productName;
 		[DataMember]
 		[SqlField(DbType.String, 40, ColumnName ="ProductName" )]		
@@ -810,8 +822,8 @@ namespace Northwind.Entities
 			}
         }
 
-		public const string BaseTableProjectionColumnList = "[OrderID], [ProductID], [UnitPrice], [Quantity], [Discount]";
-		public const string BasicProjectionColumnList = "[OrderID], [ProductID], [UnitPrice], [Quantity], [Discount], [ProductName], [LineTotal]";
+		public const string BaseTableProjectionColumnList = "[OrderID], [ProductID], [UnitPrice], [Quantity], [Discount], [OrderDetailID]";
+		public const string BasicProjectionColumnList = "[OrderDetailID], [OrderID], [ProductID], [UnitPrice], [Quantity], [Discount], [ProductName], [LineTotal]";
 
 	}
 
@@ -827,7 +839,80 @@ namespace Northwind.Entities
 			set { base.DataService = value; }
 		}
 
-	}
+		public OrderDetail Get(string projectionName, Int32 orderDetailId)
+		{
+			return ((IRepository<OrderDetail>)this).Get(projectionName, orderDetailId, FetchMode.UseIdentityMap);
+		}
+
+		public OrderDetail Get(string projectionName, Int32 orderDetailId, FetchMode fetchMode = FetchMode.UseIdentityMap)
+		{
+			return ((IRepository<OrderDetail>)this).Get(projectionName, orderDetailId, fetchMode);
+		}
+
+		public OrderDetail Get(Projection projection, Int32 orderDetailId)
+		{
+			return ((IRepository<OrderDetail>)this).Get(projection, orderDetailId, FetchMode.UseIdentityMap);
+		}
+
+		public OrderDetail Get(Projection projection, Int32 orderDetailId, FetchMode fetchMode = FetchMode.UseIdentityMap)
+		{
+			return ((IRepository<OrderDetail>)this).Get(projection, orderDetailId, fetchMode);
+		}
+
+		public OrderDetail Get(string projectionName, Int32 orderDetailId, params string[] fields)
+		{
+			return ((IRepository<OrderDetail>)this).Get(projectionName, orderDetailId, fields);
+		}
+
+		public OrderDetail Get(Projection projection, Int32 orderDetailId, params string[] fields)
+		{
+			return ((IRepository<OrderDetail>)this).Get(projection, orderDetailId, fields);
+		}
+
+		public bool Delete(Int32 orderDetailId)
+		{
+			var entity = new OrderDetail { OrderDetailId = orderDetailId };
+			return this.Delete(entity);
+		}
+
+				// asyncrhonous methods
+
+		public System.Threading.Tasks.Task<OrderDetail> GetAsync(string projectionName, Int32 orderDetailId)
+		{
+			return ((IRepository<OrderDetail>)this).GetAsync(projectionName, orderDetailId, FetchMode.UseIdentityMap);
+		}
+
+		public System.Threading.Tasks.Task<OrderDetail> GetAsync(string projectionName, Int32 orderDetailId, FetchMode fetchMode = FetchMode.UseIdentityMap)
+		{
+			return ((IRepository<OrderDetail>)this).GetAsync(projectionName, orderDetailId, fetchMode);
+		}
+
+		public System.Threading.Tasks.Task<OrderDetail> GetAsync(Projection projection, Int32 orderDetailId)
+		{
+			return ((IRepository<OrderDetail>)this).GetAsync(projection, orderDetailId, FetchMode.UseIdentityMap);
+		}
+
+		public System.Threading.Tasks.Task<OrderDetail> GetAsync(Projection projection, Int32 orderDetailId, FetchMode fetchMode = FetchMode.UseIdentityMap)
+		{
+			return ((IRepository<OrderDetail>)this).GetAsync(projection, orderDetailId, fetchMode);
+		}
+
+		public System.Threading.Tasks.Task<OrderDetail> GetAsync(string projectionName, Int32 orderDetailId, params string[] fields)
+		{
+			return ((IRepository<OrderDetail>)this).GetAsync(projectionName, orderDetailId, fields);
+		}
+
+		public System.Threading.Tasks.Task<OrderDetail> GetAsync(Projection projection, Int32 orderDetailId, params string[] fields)
+		{
+			return ((IRepository<OrderDetail>)this).GetAsync(projection, orderDetailId, fields);
+		}
+
+		public System.Threading.Tasks.Task<bool> DeleteAsync(Int32 orderDetailId)
+		{
+			var entity = new OrderDetail { OrderDetailId = orderDetailId };
+			return this.DeleteAsync(entity);
+		}
+			}
 	[Obsolete("Use nameof instead")]
 	public static partial class OrderDetailFields
 	{
@@ -836,6 +921,7 @@ namespace Northwind.Entities
 		public const string UnitPrice = "UnitPrice";
 		public const string Quantity = "Quantity";
 		public const string Discount = "Discount";
+		public const string OrderDetailId = "OrderDetailId";
 		public const string ProductName = "ProductName";
 		public const string LineTotal = "LineTotal";
 	}
@@ -1472,6 +1558,7 @@ namespace Northwind.Entities
         }
 
 		public const string BaseTableProjectionColumnList = "[EmployeeID], [LastName], [FirstName], [Title], [TitleOfCourtesy], [BirthDate], [HireDate], [Address], [City], [Region], [PostalCode], [Country], [HomePhone], [Extension], [Photo], [Notes], [ReportsTo], [PhotoPath]";
+		public const string MinimalProjectionColumnList = "[EmployeeID], [FirstName], [LastName]";
 
 	}
 
@@ -1587,6 +1674,7 @@ namespace Northwind.Entities
 	public static partial class EmployeeProjections
 	{
 		public const string BaseTable = "BaseTable";
+		public const string Minimal = "Minimal";
 	}
 	[Serializable]
 	[DataContract]

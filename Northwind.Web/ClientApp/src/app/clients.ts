@@ -234,6 +234,187 @@ export class CatalogClient {
 }
 
 @Injectable()
+export class CustomersClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ? baseUrl : "";
+    }
+
+    /**
+     * Returns Customers List
+     * @return Customer List
+     */
+    getAllCustomers(): Observable<Customer[]> {
+        let url_ = this.baseUrl + "/customers/getallcustomers";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",			
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllCustomers(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllCustomers(<any>response_);
+                } catch (e) {
+                    return <Observable<Customer[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<Customer[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetAllCustomers(response: HttpResponseBase): Observable<Customer[]> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : <Customer[]>JSON.parse(_responseText, this.jsonParseReviver);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<Customer[]>(<any>null);
+    }
+
+    /**
+     * Return Customer By Id
+     * @return Customer Detail
+     */
+    customerById(customerId: string | null): Observable<Customer> {
+        let url_ = this.baseUrl + "/customers?";
+        if (customerId === undefined)
+            throw new Error("The parameter 'customerId' must be defined.");
+        else
+            url_ += "customerId=" + encodeURIComponent("" + customerId) + "&"; 
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",			
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCustomerById(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCustomerById(<any>response_);
+                } catch (e) {
+                    return <Observable<Customer>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<Customer>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processCustomerById(response: HttpResponseBase): Observable<Customer> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : <Customer>JSON.parse(_responseText, this.jsonParseReviver);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<Customer>(<any>null);
+    }
+}
+
+@Injectable()
+export class EmployeesClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ? baseUrl : "";
+    }
+
+    /**
+     * Returns Employee List
+     * @return Employee List
+     */
+    getAllEmployees(): Observable<EmployeeMinimal[]> {
+        let url_ = this.baseUrl + "/employees/getallemployees";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",			
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllEmployees(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllEmployees(<any>response_);
+                } catch (e) {
+                    return <Observable<EmployeeMinimal[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<EmployeeMinimal[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetAllEmployees(response: HttpResponseBase): Observable<EmployeeMinimal[]> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : <EmployeeMinimal[]>JSON.parse(_responseText, this.jsonParseReviver);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<EmployeeMinimal[]>(<any>null);
+    }
+}
+
+@Injectable()
 export class OrdersClient {
     private http: HttpClient;
     private baseUrl: string;
@@ -560,6 +741,25 @@ export interface Supplier {
     homePage?: string | undefined;
 }
 
+export interface Customer {
+    customerId?: string | undefined;
+    companyName?: string | undefined;
+    contactName?: string | undefined;
+    contactTitle?: string | undefined;
+    address?: string | undefined;
+    city?: string | undefined;
+    region?: string | undefined;
+    postalCode?: string | undefined;
+    country?: string | undefined;
+    phone?: string | undefined;
+    fax?: string | undefined;
+}
+
+export interface EmployeeMinimal {
+    employeeId: number;
+    employeeFullName?: string | undefined;
+}
+
 export interface Order {
     orderId: number;
     customerId?: string | undefined;
@@ -600,10 +800,19 @@ export interface OrderDetail {
 }
 
 export interface OrderCriteria {
-    customerId?: string | undefined;
+    customerIds?: string[] | undefined;
+    orderId?: number | undefined;
     orderDateFrom?: Date | undefined;
     orderDateTo?: Date | undefined;
-    employeeId?: number | undefined;
+    employeeIds?: number[] | undefined;
+    shipperIds?: number[] | undefined;
+    productIds?: number[] | undefined;
+    orderAmountFrom?: number | undefined;
+    orderAmountTo?: number | undefined;
+    requiredDateFrom?: Date | undefined;
+    requiredDateTo?: Date | undefined;
+    shippedDateFrom?: Date | undefined;
+    shippedDateTo?: Date | undefined;
 }
 
 export interface WeatherForecast {

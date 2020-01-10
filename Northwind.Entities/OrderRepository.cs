@@ -9,10 +9,27 @@ namespace Northwind.Entities
 
     public class OrderCriteria
     {
-        public string CustomerId { get; set; }
-        public DateTime? OrderDateFrom { get; set; }
+        public ICollection<string> CustomerIds { get; set; }
+
+        public int? OrderId { get; set; }
+        public DateTime? OrderDateFrom { get; set; } 
         public DateTime? OrderDateTo { get; set; }
-        public int? EmployeeId { get; set; }
+        public ICollection<int?> EmployeeIds { get; set; }
+
+        public ICollection<int?> ShipperIds { get; set; }
+
+        public ICollection<int?> ProductIds { get; set; }
+
+        public decimal? OrderAmountFrom { get; set; }
+
+        public decimal? OrderAmountTo { get; set; }
+
+        public DateTime? RequiredDateFrom { get; set; }
+        public DateTime? RequiredDateTo { get; set; }
+
+        public DateTime? ShippedDateFrom { get; set; }
+
+        public DateTime? ShippedDateTo { get; set; }
     }
 
     public partial class OrderRepository
@@ -57,16 +74,40 @@ namespace Northwind.Entities
 
         public IQueryLite<Order> SearchQuery(OrderCriteria criteria)
         {
-            var query = this.Query(OrderProjections.Basic);
+            var query = this.Query(OrderProjections.WithTotal);
 
-            if (criteria.CustomerId != null)
+            if (criteria.CustomerIds != null && criteria.CustomerIds.Count > 0)
             {
-                query.Where(nameof(Order.CustomerId), OperatorLite.Equals, criteria.CustomerId);
+                query.Where(nameof(Order.CustomerId), OperatorLite.In, criteria.CustomerIds);
             }
 
-            if (criteria.EmployeeId.HasValue)
+            if (criteria.EmployeeIds != null && criteria.EmployeeIds.Count > 0)
             {
-                query.Where(nameof(Order.EmployeeId), OperatorLite.Equals, criteria.EmployeeId);
+                query.Where(nameof(Order.EmployeeId), OperatorLite.In, criteria.EmployeeIds);
+            }
+
+            if(criteria.ShipperIds != null && criteria.ShipperIds.Count > 0)
+            {
+                query.Where(nameof(Shipper.ShipperId), OperatorLite.In, criteria.ShipperIds);
+            }
+
+            if(criteria.ProductIds != null && criteria.ProductIds.Count > 0)
+            {
+                query.Where(nameof(Product.ProductId), OperatorLite.In, criteria.ProductIds);
+            }
+
+            if (criteria.OrderId.HasValue)
+            {
+                query.Where(nameof(Order.OrderId), OperatorLite.Equals, criteria.OrderId);
+            }
+
+            if (criteria.RequiredDateFrom.HasValue)
+            {
+                query.Where(nameof(Order.RequiredDate), OperatorLite.GreaterOrEquals, criteria.RequiredDateFrom);
+            }
+            if (criteria.RequiredDateTo.HasValue)
+            {
+                query.Where(nameof(Order.RequiredDate), OperatorLite.LessOrEquals, criteria.RequiredDateTo);
             }
 
             if (criteria.OrderDateFrom.HasValue)
@@ -77,6 +118,14 @@ namespace Northwind.Entities
             if (criteria.OrderDateTo.HasValue)
             {
                 query.Where(nameof(Order.OrderDate), OperatorLite.LessOrEquals, criteria.OrderDateTo.Value);
+            }
+            if (criteria.OrderAmountFrom.HasValue)
+            {
+                query.Where(nameof(Order.OrderTotal), OperatorLite.GreaterOrEquals, criteria.OrderAmountFrom);
+            }
+            if (criteria.OrderAmountTo.HasValue)
+            {
+                query.Where(nameof(Order.OrderTotal), OperatorLite.LessOrEquals, criteria.OrderAmountFrom);
             }
 
             return query;

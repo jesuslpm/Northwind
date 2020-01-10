@@ -11,13 +11,16 @@ import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { HomeComponent } from './home/home.component';
 import { CatalogComponent } from './catalog/catalog.component';
 import { OrdersComponent } from './orders/orders.component';
-import { CatalogClient, OrdersClient } from './clients';
+import { CatalogClient, 
+  OrdersClient, CustomersClient
+} from './clients';
 import { ProductsComponent } from './products/products.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { DataTablesModule } from 'angular-datatables';
 import { ToastrModule } from 'ngx-toastr';
 import { BlockUIModule } from 'ng-block-ui';
 import { ModalModule } from 'ngx-bootstrap/modal';
+import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 @NgModule({
   declarations: [
     AppComponent,
@@ -43,10 +46,12 @@ import { ModalModule } from 'ngx-bootstrap/modal';
     ToastrModule.forRoot(),
     BlockUIModule.forRoot(),
     ModalModule.forRoot(),
+    BsDatepickerModule.forRoot(),
   ],
   providers: [
     CatalogClient,
     OrdersClient,
+    CustomersClient,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: TokenInterceptor,

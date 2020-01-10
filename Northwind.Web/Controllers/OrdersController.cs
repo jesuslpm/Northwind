@@ -65,7 +65,8 @@ namespace Northwind.Web.Controllers
         public async Task<IActionResult> Search(OrderCriteria searchCriteria)
         {
             var orders = await dataService.OrderRepository.SearchQuery(searchCriteria)
-                .ToListAsync(0, 999);
+                .OrderByDesc(nameof(Order.OrderId))
+                .ToListAsync(0,199);
             return Ok(orders);
         }
     }

@@ -23,7 +23,6 @@ namespace Northwind.Web
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDataService();
-            services.AddControllers().AddNewtonsoftJson();
             services.AddControllersWithViews().AddNewtonsoftJson();
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
@@ -48,7 +47,7 @@ namespace Northwind.Web
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseCors(options => options.AllowAnyOrigin());
+            app.UseCors(builder => builder.WithOrigins("http://localhost:4200").AllowAnyHeader().AllowAnyMethod());
             if (!env.IsDevelopment())
             {
                 app.UseSpaStaticFiles();

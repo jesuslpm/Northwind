@@ -48,13 +48,29 @@ namespace Northwind.Web.Controllers
         /// Saves an order including its order details
         /// </summary>
         /// <returns>The order</returns> 
-        [HttpPost("")]
+        [HttpPut("")]
         [ProducesResponseType(typeof(Order), StatusCodes.Status200OK)]
         public async Task<IActionResult> SaveWholeOrder(Order order)
         {
             await dataService.OrderRepository.SaveWholeOrderAsync(order);
             return await GetWholeOrder(order.OrderId);
         }
+
+
+
+        /// <summary>
+        /// Add an order including its order details
+        /// </summary>
+        /// <returns>Add order</returns> 
+        [HttpPost("")]
+
+        [ProducesResponseType(typeof(Order), StatusCodes.Status200OK)]
+        public async Task<IActionResult> AddOrder(Order order)
+        {
+            await dataService.OrderRepository.AddOrderAsync(order);
+            return await GetWholeOrder(order.OrderId);
+        }
+
 
         /// <summary>
         /// Gets the order headers that meet the search criteria

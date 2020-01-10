@@ -500,7 +500,7 @@ export class OrdersClient {
             })
         };
 
-        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
             return this.processSaveWholeOrder(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
@@ -515,6 +515,61 @@ export class OrdersClient {
     }
 
     protected processSaveWholeOrder(response: HttpResponseBase): Observable<Order> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : <Order>JSON.parse(_responseText, this.jsonParseReviver);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<Order>(<any>null);
+    }
+
+    /**
+     * Add an order including its order details
+     * @return Add order
+     */
+    addOrder(order: Order): Observable<Order> {
+        let url_ = this.baseUrl + "/orders";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(order);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",			
+            headers: new HttpHeaders({
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processAddOrder(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processAddOrder(<any>response_);
+                } catch (e) {
+                    return <Observable<Order>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<Order>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processAddOrder(response: HttpResponseBase): Observable<Order> {
         const status = response.status;
         const responseBlob = 
             response instanceof HttpResponse ? response.body : 
@@ -639,6 +694,69 @@ export class OrdersClient {
             }));
         }
         return _observableOf<Order[]>(<any>null);
+    }
+}
+
+@Injectable()
+export class ShippersClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ? baseUrl : "";
+    }
+
+    /**
+     * Returns Customers List
+     * @return Customer List
+     */
+    getAllShippers(): Observable<Shipper[]> {
+        let url_ = this.baseUrl + "/shippers/getallshippers";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",			
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllShippers(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllShippers(<any>response_);
+                } catch (e) {
+                    return <Observable<Shipper[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<Shipper[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetAllShippers(response: HttpResponseBase): Observable<Shipper[]> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : <Shipper[]>JSON.parse(_responseText, this.jsonParseReviver);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<Shipper[]>(<any>null);
     }
 }
 
@@ -813,6 +931,12 @@ export interface OrderCriteria {
     requiredDateTo?: Date | undefined;
     shippedDateFrom?: Date | undefined;
     shippedDateTo?: Date | undefined;
+}
+
+export interface Shipper {
+    shipperId: number;
+    companyName?: string | undefined;
+    phone?: string | undefined;
 }
 
 export interface WeatherForecast {

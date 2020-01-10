@@ -27,7 +27,7 @@ namespace Northwind.Web.Controllers
         public async Task<IActionResult> GetAllCustomers()
         {
             var customers = await dataService.CustomerRepository.Query(CustomerProjections.BaseTable)
-                .OrderBy(nameof(Customer.CompanyName))
+                .OrderBy(nameof(Customer.ContactName))
                 .ToListAsync();
             return Ok(customers);
         }

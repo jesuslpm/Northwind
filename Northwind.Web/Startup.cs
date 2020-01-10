@@ -23,7 +23,6 @@ namespace Northwind.Web
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDataService();
-            services.AddControllers().AddNewtonsoftJson();
             services.AddControllersWithViews().AddNewtonsoftJson();
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>

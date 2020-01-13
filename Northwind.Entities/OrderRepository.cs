@@ -64,6 +64,30 @@ namespace Northwind.Entities
             }
         }
 
+
+        public async Task AddOrderAsync(Order entity)
+        {
+            this.DataService.BeginTransaction();
+            try
+            {
+
+                await this.DataService.OrderRepository.InsertAsync(entity);
+
+                foreach (OrderDetail orderDetail in entity.Details)
+                {
+                    orderDetail.OrderId = entity.OrderId;
+                    await this.DataService.OrderDetailRepository.InsertAsync(orderDetail);
+                }
+
+                DataService.Commit();
+            }
+            catch (Exception ex)
+            {
+                if (this.DataService.IsActiveTransaction) this.DataService.Rollback();
+                throw;
+            }
+        }
+
         public async Task<Order> GetWholeOrderAsync(int orderId)
         {
             var order = await this.GetAsync(OrderProjections.Basic, orderId).ConfigureAwait(false);
@@ -97,7 +121,11 @@ namespace Northwind.Entities
 
             if(criteria.ProductIds != null && criteria.ProductIds.Count > 0)
             {
-                query.Where(nameof(Product.ProductId), OperatorLite.In, criteria.ProductIds);
+                IQueryLite<OrderDetail> orderDetailSubQuery = DataService.OrderDetailRepository.Query(OrderDetailProjections.BaseTable)
+                                                             .Fields(FieldsOption.None, nameof(OrderDetailFields.OrderId))
+                                                              .Where(nameof(OrderDetailFields.ProductId),OperatorLite.In, criteria.ProductIds);
+
+                query.Where(nameof(Order.OrderId), OperatorLite.In, orderDetailSubQuery);
             }
 
             if (criteria.OrderId.HasValue)

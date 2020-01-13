@@ -198,7 +198,7 @@
           }
         }
       },
-      "post": {
+      "put": {
         "tags": [
           "Orders"
         ],
@@ -225,6 +225,39 @@
           "200": {
             "x-nullable": false,
             "description": "The order",
+            "schema": {
+              "$ref": "#/definitions/Order"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Add an order including its order details",
+        "operationId": "Orders_AddOrder",
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "parameters": [
+          {
+            "name": "order",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Order"
+            },
+            "x-nullable": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "x-nullable": false,
+            "description": "Add order",
             "schema": {
               "$ref": "#/definitions/Order"
             }
@@ -285,6 +318,27 @@
               "type": "array",
               "items": {
                 "$ref": "#/definitions/Order"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/shippers/getallshippers": {
+      "get": {
+        "tags": [
+          "Shippers"
+        ],
+        "summary": "Returns Customers List",
+        "operationId": "Shippers_GetAllShippers",
+        "responses": {
+          "200": {
+            "x-nullable": false,
+            "description": "Customer List",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Shipper"
               }
             }
           }
@@ -696,6 +750,24 @@
         "shippedDateTo": {
           "type": "string",
           "format": "date-time"
+        }
+      }
+    },
+    "Shipper": {
+      "type": "object",
+      "required": [
+        "shipperId"
+      ],
+      "properties": {
+        "shipperId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "companyName": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
         }
       }
     },

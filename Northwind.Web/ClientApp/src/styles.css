@@ -2,7 +2,7 @@
 
 /* Provide sufficient contrast against white background */
 body{
-  background: #f9f9f9;
+  background: #f2f5f9;
   font-family: sans-serif;
 }
 
@@ -43,8 +43,44 @@ code {
   color: red;
 }
 
+.modal-xlg{
+  width: 900px;
+  max-width: 900px;
+}
+
+.inner-tab {
+  padding: 15px;
+}
+
 datatable-header, datatable-body, datatable-footer{
   width: auto !important;
+}
+#table-order-detail{
+  width:100%;
+  border-bottom: 1px solid lightgray;
+  margin-top: 20px;
+}
+
+.order-detail-table tr{
+  border-bottom: 1px solid lightgray;
+}
+.order-detail-table td {
+  padding: 4px;
+}
+.nav-tabs{
+  border: none;
+}
+.inner-tab{
+  border:1px solid lightgray;
+  padding: 10px;
+}
+
+.order-total-outer {
+  margin-top: 30px;
+}
+
+.tab-outer{
+  margin-top: 20px;
 }
 
 .product-card .card-header{
@@ -273,4 +309,32 @@ table.upgraded.dataTable {
 
 .predate {
   display: none;
+}
+
+
+
+/* newcss */
+
+.theme-green .bs-datepicker-head {
+  background: #00a9f4;
+}
+
+.theme-green .bs-datepicker-body table td.week span {
+  color: #00a9f4;
+}
+
+.theme-green .bs-datepicker-body table td span.selected, .theme-green .bs-datepicker-body table td.selected span, .theme-green .bs-datepicker-body table td span[class*="select-"]:after, .theme-green .bs-datepicker-body table td[class*="select-"] span:after {
+  background: #00a9f4;
+}
+.ng-select.ng-select-multiple .ng-select-container .ng-value-container .ng-value {
+  background: rgba(0, 169, 244, 0.25);
+  padding: 3px 4px;
+}
+
+.ng-select.ng-select-multiple .ng-select-container .ng-value-container .ng-value .ng-value-icon.left {
+  padding-right: 7px;
+}
+
+.ng-select.ng-select-multiple .ng-select-container .ng-value-container .ng-value .ng-value-label {
+  padding: 0 9px;
 }

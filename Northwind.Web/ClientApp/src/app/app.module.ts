@@ -1,3 +1,4 @@
+
 import { TokenInterceptor } from './auth/token.interceptor';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
@@ -11,9 +12,7 @@ import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { HomeComponent } from './home/home.component';
 import { CatalogComponent } from './catalog/catalog.component';
 import { OrdersComponent } from './orders/orders.component';
-import { CatalogClient, 
-  OrdersClient, CustomersClient
-} from './clients';
+import { CatalogClient, OrdersClient,CustomersClient, EmployeesClient, ShippersClient} from './clients';
 import { ProductsComponent } from './products/products.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { DataTablesModule } from 'angular-datatables';
@@ -21,6 +20,9 @@ import { ToastrModule } from 'ngx-toastr';
 import { BlockUIModule } from 'ng-block-ui';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
+import { NgSelectModule } from '@ng-select/ng-select';
+import { TabsModule } from 'ngx-bootstrap/tabs';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -47,11 +49,15 @@ import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
     BlockUIModule.forRoot(),
     ModalModule.forRoot(),
     BsDatepickerModule.forRoot(),
+    NgSelectModule,
+    TabsModule.forRoot(),
   ],
   providers: [
     CatalogClient,
     OrdersClient,
+    EmployeesClient,
     CustomersClient,
+    ShippersClient,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: TokenInterceptor,

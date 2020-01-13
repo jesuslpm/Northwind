@@ -44,8 +44,7 @@ code {
 }
 
 .modal-xlg{
-  width: 900px;
-  max-width: 900px;
+  max-width: 900px !important;
 }
 
 .inner-tab {
@@ -298,9 +297,11 @@ table.upgraded.dataTable {
 .dataTables_filter, .dataTables_length {
   font-size: 14px;
 }
-
+.nav-tabs .nav-link {
+  font-size: 14px;
+}
 .nav-item:last-child a{
-    padding-right:0 !important;
+    /* padding-right:0 !important; */
 }
 
 .pointer-none {
@@ -338,3 +339,8 @@ table.upgraded.dataTable {
 .ng-select.ng-select-multiple .ng-select-container .ng-value-container .ng-value .ng-value-label {
   padding: 0 9px;
 }
+
+.right-side-modal.product-modal.modal-dialog.big {max-width: 800px;}
+.ng-dropdown-panel .ng-dropdown-panel-items .ng-option {
+  font-size: 14px;
+} 

@@ -3,7 +3,7 @@ import { Component, OnInit, OnDestroy,AfterViewInit,ViewChild, TemplateRef  } fr
 import { CatalogClient, Product, 
   Category, Supplier, 
   OrdersClient, Order,CustomersClient, Customer, 
-  EmployeesClient, EmployeeMinimal,ShippersClient, Shipper
+  EmployeesClient, EmployeeMinimal,ShippersClient, Shipper, OrderCriteria
 } from '../clients';
 
 import { Subject } from 'rxjs';
@@ -13,6 +13,7 @@ import { BsModalService, BsModalRef, ModalDirective } from 'ngx-bootstrap/modal'
 import { ToastrService } from 'ngx-toastr';
 import * as moment from 'moment';
 import Swal from 'sweetalert2';
+import { validatePostiveInteger, validatePositiveDecimal } from '../custom-validations/validations';
 
 @Component({
   selector: 'app-orders',
@@ -38,6 +39,7 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
 
   searchForm: FormGroup;
   advanceSearchForm: FormGroup;
+  advanceSearchSubmitted:Boolean= false;
   productForm: FormGroup;
   orderForm: FormGroup;
   modalRef: BsModalRef;
@@ -53,7 +55,7 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
   orderProducts: any = [];
   netTotal: any = 0;
   orderEditMode: Boolean = false;
-
+  productEditMode: Boolean = false;
 
   constructor(
     private client: CatalogClient,
@@ -139,7 +141,8 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
 
       this.productForm = this.fb.group({
         productId: ['', [Validators.required]],
-        quantity: ['', [Validators.required]]
+        quantity: ['', [Validators.required, validatePostiveInteger]],
+        discount: ['',[validatePositiveDecimal]]
       });
   }
 
@@ -152,7 +155,7 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
     $.fn['dataTable'].ext.search.pop();
   }
 
-  getOrders(loadFirstTime = false) {
+  /*getOrders(loadFirstTime = false) {
     this.ordersClient.getAllOrders()
           .subscribe((orders) => {
             if(orders != null) {
@@ -164,7 +167,7 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
     },(err) => {
       this.toastr.error('Something went wrong!', 'Error!');
     });
-  }
+  }*/
 
   getCustomers() {
     this.customerClient.getAllCustomers()
@@ -224,7 +227,6 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
           .subscribe(suppliers => {
             if(suppliers != null) {
               this.suppliers = suppliers;
-              this.shippersArray = this.generateShippersArray();
             } else {
               this.toastr.error('Something went wrong!', 'Error!');      
             }
@@ -232,11 +234,7 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
       this.toastr.error('Something went wrong!', 'Error!');
     });
   }
-  generateShippersArray() {
-    return this.suppliers.map(function(c) {
-      return {'id': c['companyName'],'name':c['companyName']};
-    });
-  }
+ 
 
   getEmployees() {
     this.employeeClient.getAllEmployees()
@@ -263,11 +261,17 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
           .subscribe(shippers => {
             if(shippers != null) {
               this.shippers = shippers;
+              this.shippersArray = this.generateShippersArray();
             } else {
               this.toastr.error('Something went wrong!', 'Error!');      
             }
     },(err) => {
       this.toastr.error('Something went wrong!', 'Error!');
+    });
+  }
+  generateShippersArray() {
+    return this.shippers.map(function(c) {
+      return {'id': c['shipperId'],'name':c['companyName']};
     });
   }
 
@@ -282,7 +286,7 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
 
   searchFormSubmit() {
     if(this.searchForm.valid) {
-      let searchData:any = {};
+      let searchData: any = {};
       if(this.searchForm.value.customerIds != "") {
         searchData.customerIds = [this.searchForm.value.customerIds];
       } else {
@@ -297,13 +301,15 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
       
       if(this.searchForm.value.orderDateFrom != null) {
         searchData.orderDateFrom = moment(this.searchForm.value.orderDateFrom).format("YYYY-MM-DD");
+        //searchData.orderDateFrom = new Date(this.searchForm.value.orderDateFrom);
+        // searchData.orderDateFrom = new Date();
         searchData.orderDateTo = searchData.orderDateFrom;
       } else {
         searchData.orderDateFrom =  null;
         searchData.orderDateTo =  null;
       }
       
-      searchData.employeeIds = [];
+     /* searchData.employeeIds = [];
       searchData.shipperIds = [];
       searchData.productIds= [];
       searchData.orderAmountFrom =  null;
@@ -311,7 +317,7 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
       searchData.requiredDateFrom = null;
       searchData.requiredDateTo = null;
       searchData.shippedDateFrom = null;
-      searchData.shippedDateTo  = null;
+      searchData.shippedDateTo  = null;*/
 
       this.ordersClient.search(searchData)
           .subscribe(orders => {
@@ -331,7 +337,7 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   advanceSearchSubmit() {
-    console.log('this.advanceSearchForm',this.advanceSearchForm.errors);
+    this.advanceSearchSubmitted = true;
     if(this.advanceSearchForm.errors == null) {
       let searchData:any = {};
       searchData = this.advanceSearchForm.value;
@@ -354,25 +360,42 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
         searchData.shippedDateTo = moment(searchData.shippedDateTo).format("YYYY-MM-DD");
       }
 
-      searchData.customerIds = searchData.customerIds.filter(function (el) {
-        return el != "";
-      });
-
-      searchData.employeeIds = searchData.employeeIds.filter(function (el) {
-        return el != "";
-      });
+      console.log('searchData.customerIds',searchData.customerIds)
+      if(searchData.customerIds != null){
+        searchData.customerIds = searchData.customerIds.filter(function (el) {
+          return el != "";
+        });
+      } else {
+        searchData.customerIds = [];
+      }
       
-      searchData.shipperIds = searchData.shipperIds.filter(function (el) {
-        return el != "";
-      });
+      if(searchData.employeeIds != null){
+        searchData.employeeIds = searchData.employeeIds.filter(function (el) {
+          return el != "";
+        }); 
+      } else {
+        searchData.employeeIds = [];
+      }
+      
+      if(searchData.shipperIds != null){
+        searchData.shipperIds = searchData.shipperIds.filter(function (el) {
+          return el != "";
+        });
+      } else {
+        searchData.shipperIds = [];
+      }
+      
+      if(searchData.productIds != null){
+        searchData.productIds = searchData.productIds.filter(function (el) {
+          return el != "";
+        });
+      } else {
+        searchData.productIds = [];
+      }
 
-      searchData.productIds = searchData.productIds.filter(function (el) {
-        return el != "";
-      });
       
       searchData.orderId = null;
       //searchData.productIds = [];
-      console.log('this.advance search', this.advanceSearchForm.value);
       this.ordersClient.search(searchData)
           .subscribe(orders => {
             if(orders != null) {
@@ -388,15 +411,13 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
       });
 
     } else {
-
-      console.log('invalid advance search form', this.advanceSearchForm.errors);
       return false;
     }
     
   }
 
   openAdvanceSearchModal(template: TemplateRef<any>) {
-    this.modalRef = this.modalService.show(template, {class: 'modal-lg right-side-modal'});
+    this.modalRef = this.modalService.show(template, {class: 'modal-lg right-side-modal product-modal big'});
   }
   onOrderDateFromChange(value: Date) {
     // this.advanceSearchForm.patchValue({
@@ -517,7 +538,6 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   onOrderAmountFromChange() {
-    console.log(this.advanceSearchForm.value.orderAmountFrom);
     if(this.advanceSearchForm.value.orderAmountFrom != null) {
       this.advanceSearchForm.controls['orderAmountTo'].setValidators([Validators.required])
     } else {
@@ -534,10 +554,7 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
   amountValidation(group: FormGroup):any {
     let orderAmountFrom = group.get('orderAmountFrom').value;
     let orderAmountTo = group.get('orderAmountTo').value;
-    console.log('orderAmountFrom', orderAmountFrom);
-    console.log('orderAmountTo', orderAmountTo);
     if(orderAmountFrom != null && orderAmountTo != null) {
-      console.log('in if');
       if(orderAmountTo < orderAmountFrom) {
         return {'invalidSearchAmountTo': true}
       } 
@@ -545,13 +562,16 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
     } else {
       return null; 
     }
-    
+  }
+  clearSearch() {
+    this.advanceSearchSubmitted = false;
+    this.advanceSearchForm.reset();
   }
 
 
   openOrderModal(template: TemplateRef<any>,isEdit=false, orderId=0) {
     this.orderEditMode = isEdit;
-    this.clearModalData();
+    //this.clearModalData();
     if(isEdit) {
       this.ordersClient.getWholeOrder(orderId)
         .subscribe((order) => {
@@ -582,7 +602,7 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
         this.toastr.error('Something went wrong!', 'Error!');
       });
     }
-    this.modalRef = this.modalService.show(template, {class: 'modal-xlg right-side-modal', animated: true});
+    this.modalRef = this.modalService.show(template, {class: 'modal-xlg right-side-modal product-modal big', animated: true});
   }
 
   getCustomerInfo() {
@@ -611,6 +631,19 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
   
+
+  editProduct(idx) {
+    this.productEditMode = true;
+    let productDetails = this.orderProducts[idx];
+    console.log('productDetails',productDetails);
+    this.currentProduct = productDetails;
+    this.currentProduct.index = idx;
+    this.productForm.patchValue({
+      productId:productDetails.productId,
+      quantity: productDetails.quantity,
+      discount: productDetails.discount?(productDetails.discount*100):'',
+    });
+  }
 
   deleteProduct(idx) {
     Swal.fire({
@@ -648,7 +681,7 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
       //var today = moment().format('YYYY-MM-DD');
       // add order
       delete orderData["orderId"];
-      this.ordersClient.addOrder(orderData)
+      this.ordersClient.saveWholeOrder(orderData)
         .subscribe((res) => {
           if(res != null) {
             this.toastr.success('Order created successfully!', 'Success!');
@@ -693,14 +726,24 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
               if(this.orderEditMode) {
                 orderData.orderId = this.orderForm.value.orderId;
               }
-              orderData.productId= +this.productForm.value.productId;
-              orderData.quantity= this.productForm.value.quantity;
+              orderData.productId = +this.productForm.value.productId;
+              orderData.quantity = this.productForm.value.quantity;
               orderData.unitPrice = product.unitPrice;
-              orderData.lineTotal = +(product.unitPrice * this.productForm.value.quantity).toFixed(2);
+              orderData.discount = this.productForm.value.discount
+              if(orderData.discount && orderData.discount != '') {
+                orderData.discount = +(+this.productForm.value.discount / 100).toFixed(2);
+              }
+              orderData.lineTotal = +(product.unitPrice * this.productForm.value.quantity);
+              orderData.lineTotal = +(orderData.lineTotal - (orderData.lineTotal*(this.productForm.value.discount/100))).toFixed(2);
               orderData.productName = product.productName;
               
-              
-              this.orderProducts.push(orderData); 
+              if(this.productEditMode) {
+                this.orderProducts.splice(this.currentProduct.index,1,orderData);
+                this.productEditMode = false;
+                this.currentProduct = {};
+              } else {
+                this.orderProducts.push(orderData); 
+              }
               
               this.calculateNetTotal();
               this.productForm.reset();

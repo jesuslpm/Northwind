@@ -21,7 +21,7 @@
                     </div>
                     </div>
                     <div class="col"><div class="form-group">
-                        <input type="text" placeholder="dd/mm/yyyy" formControlName="orderDateFrom"
+                        <input type="text" placeholder="DD/MM/YYYY" formControlName="orderDateFrom"
                                     class="form-control" bsDatepicker
                                     [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', adaptivePosition: true }">
                     </div>
@@ -66,7 +66,7 @@
                         <td><span class='predate'>{{o.shippedDate| date:'yyyy/MM/dd'}}</span>{{o.shippedDate | date:'dd/MM/yyyy'}}</td>
                         <td class="text-right">$ {{o.orderTotal | number : '1.2-2'}}</td>
                         <td>
-                            <button class='btn btn-primary pointer-none'>Edit</button>
+                            <button class='btn btn-primary' (click)="openOrderModal(createOrderTemplate, true, o.orderId)">Edit</button>
                         </td>
                     </tr>
                 </tbody>
@@ -183,11 +183,11 @@
                             <div class="col-sm-3">
                                 <input type="number" placeholder="" formControlName="orderAmountTo"
                                     class="form-control" (change)="onOrderAmountToChange()">
-                                <div *ngIf="advanceSearchForm.controls.orderAmountTo?.errors?.required"
+                                <div *ngIf="advanceSearchSubmitted && advanceSearchForm.controls.orderAmountTo?.errors?.required"
                                     class="validation-error">
                                     This field is required
                                 </div>
-                                <div *ngIf="((!advanceSearchForm.controls.orderAmountTo?.errors?.required) && advanceSearchForm.hasError('invalidSearchAmountTo'))" class="validation-error">
+                                <div *ngIf="advanceSearchSubmitted && ((!advanceSearchForm.controls.orderAmountTo?.errors?.required) && advanceSearchForm.hasError('invalidSearchAmountTo'))" class="validation-error">
                                     Order amount to should not be less than Order amount from.
                                 </div>
                                 
@@ -298,8 +298,11 @@
                     <div class="form-group form-group-sm col-sm-12">
                         <div class="row">
                             <div class="col-sm-3"></div>
-                            <div class="col-md-9">
+                            <div class="col-md-2">
                                 <button type="submit" class="btn btn-primary">Search</button>
+                            </div>
+                            <div class="col-md-3">
+                                <button type="button" class="btn btn-primary" (click)="clearSearch()">Clear</button>
                             </div>
                         </div>
                     </div>
@@ -326,8 +329,8 @@
                         <label for="customerId" class="col-sm-2 col-form-label">Customer</label>
                         <div class="col-sm-10">
                             <select id="customerId" name="customerId" formControlName="customerId" class="form-control"
-                                (change)="getCustomerInfo()">
-                                <option value="">Customer</option>
+                                (change)="getCustomerInfo()" placeholder="Select Customer">
+                                <option value=""> Select Customer</option>
                                 <option *ngFor="let customer of customers;" [value]="customer.customerId">
                                     {{customer.contactName}}
                                 </option>
@@ -446,7 +449,7 @@
                             <label for="categoryId" class="col-form-label">Required Date</label>
                         </div>
                         <div class="col-sm-3">
-                            <input type="text" placeholder="dd/mm/yyyy" formControlName="requiredDate"
+                            <input type="text" placeholder="DD/MM/YYYY" formControlName="requiredDate"
                                 class="form-control" bsDatepicker
                                 [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', adaptivePosition: true }">
                             <div *ngIf="isOrderFormSubmitted && orderForm.controls.requiredDate?.errors?.required"
@@ -458,7 +461,7 @@
                             <label for="categoryId" class="col-form-label">Shipped Date</label>
                         </div>
                         <div class="col-sm-3">
-                            <input type="text" placeholder="dd/mm/yyyy" formControlName="shippedDate"
+                            <input type="text" placeholder="DD/MM/YYYY" formControlName="shippedDate"
                                 class="form-control" bsDatepicker
                                 [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', adaptivePosition: true }"
                                 (bsValueChange)="onOrderDateToChange($event)" [minDate]="minOrderDateTo">
@@ -480,7 +483,7 @@
                                 <div class="form-group col-sm-12">
                                     <div class="row">
                                         <label for="productId" class="col-sm-1 col-form-label">Product</label>
-                                        <div class="col-sm-4">
+                                        <div class="col-sm-3">
                                             <select id="product" name="productId" formControlName="productId"
                                                 class="form-control">
                                                 <option value="">Product</option>
@@ -496,15 +499,32 @@
                                         <label for="quantity" class="col-sm-1 col-form-label">Quantity</label>
                                         <div class="col-sm-2">
                                             <input type="number" id="quantity" name="quantity"
-                                                formControlName="quantity" min="0" step="1" class="form-control">
+                                                formControlName="quantity" min="1" step="1" class="form-control">
                                             <div *ngIf="isProductFormSubmitted && productForm.controls.quantity?.errors?.required"
                                                 class="validation-error">
                                                 This field is required
                                             </div>
+                                            <div *ngIf="isProductFormSubmitted && (!(productForm.controls.quantity?.errors?.required) && (productForm.controls.quantity?.errors?.positiveInteger))"
+                                                class="validation-error">
+                                                Invalid Quantity value
+                                            </div>
+                                        </div>
+                                        <label for="discount" class="col-sm-1 col-form-label">Discount</label>
+                                        <div class="col-sm-2">
+                                            <input type="number" id="discount" name="discount"
+                                                formControlName="discount" min="0" step="1" class="form-control">
+                                            <div *ngIf="isProductFormSubmitted && productForm.controls.discount?.errors?.required"
+                                                class="validation-error">
+                                                    This field is required
+                                            </div>
+                                            <div *ngIf="isProductFormSubmitted && (!(productForm.controls.discount?.errors?.required) && (productForm.controls.discount?.errors?.positiveDecimal))"
+                                                class="validation-error">
+                                                Invalid Discount value
+                                            </div>
                                         </div>
                                         <div class="col-sm-1">
                                             <button type="submit" class="btn btn-primary"
-                                                (click)="onAddProduct()">Add</button>
+                                                (click)="onAddProduct()">{{productEditMode != true?'Add':'Update'}}</button>
                                         </div>
                                     </div>
                                 </div>
@@ -529,7 +549,7 @@
                                         <td>{{p.unitPrice | number : '1.2-2'}}</td>
                                         <td>{{p.lineTotal | number : '1.2-2'}}</td>
                                         <td>
-                                            <button class='btn btn-primary'>Edit</button>
+                                            <button class='btn btn-primary' (click)="editProduct(idx)">Edit</button>
                                             <button class='btn btn-primary offset-1'
                                                 (click)="deleteProduct(idx)">Delete</button>
                                         </td>
@@ -550,9 +570,7 @@
                     <label>Order total: ${{netTotal}}</label>
                 </div>
                 <div class="col-md-2 offset-6">
-                    <button type="button" class="btn btn-primary" (click)="onSubmitOrder()">Save Data</button>
-                    <!-- <button *ngIf="orderEditMode" type="button" class="btn btn-primary" (click)="onUpdateOrder()">Save Data</button> -->
-
+                    <button type="button" class="btn btn-primary" (click)="onSubmitOrder()" [disabled]="orderProducts && orderProducts.length == 0">Save Data</button>
                 </div>
             </div>
         </div>

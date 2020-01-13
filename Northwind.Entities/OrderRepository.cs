@@ -34,23 +34,27 @@ namespace Northwind.Entities
 
     public partial class OrderRepository
     {
-        public async Task SaveWholeOrderAsync(Order entity)
+        public async Task SaveWholeOrderAsync(Order order)
         {
-            if (entity.Details == null)
+            if (order.Details == null)
             {
-                await base.SaveAsync(entity).ConfigureAwait(false);
+                await base.SaveAsync(order).ConfigureAwait(false);
                 return;
             }
             this.DataService.BeginTransaction();
             try
             {
-                await base.SaveAsync(entity).ConfigureAwait(false);
+                await base.SaveAsync(order).ConfigureAwait(false);
+                foreach (var detail in order.Details)
+                {
+                    detail.OrderId = order.OrderId;
+                }
                 var currentDetails = await this.DataService.OrderDetailRepository
                     .Query(OrderDetailProjections.Basic)
-                    .Where(nameof(OrderDetail.OrderId), OperatorLite.Equals, entity.OrderId)
+                    .Where(nameof(OrderDetail.OrderId), OperatorLite.Equals, order.OrderId)
                     .ToListAsync()
                     .ConfigureAwait(false);
-                await this.DataService.OrderDetailRepository.SaveAsync(entity.Details, currentDetails).ConfigureAwait(false);
+                await this.DataService.OrderDetailRepository.SaveAsync(order.Details, currentDetails).ConfigureAwait(false);
                 DataService.Commit();
             }
             catch

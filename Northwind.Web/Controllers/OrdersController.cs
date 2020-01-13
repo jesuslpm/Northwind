@@ -33,15 +33,15 @@ namespace Northwind.Web.Controllers
         }
 
         /// <summary>
-        /// Returns All Orders
+        /// Returns an order including its order details
         /// </summary>
         /// <returns>an order</returns> 
-        [HttpGet("getallorders")]
-        [ProducesResponseType(typeof(IList<Entities.Order>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetAllOrders()
+        [HttpGet("getorderByCustId")]
+        [ProducesResponseType(typeof(IList<Order>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetOrdersByCustID(string CustomerId)
         {
-            var orders = await dataService.OrderRepository.Query(OrderProjections.WithTotal).ToListAsync();
-            return Ok(orders);
+            var order = await dataService.OrderRepository.GetOrdersByCustIDAsync(CustomerId);
+            return Ok(order);
         }
 
         /// <summary>
@@ -56,20 +56,7 @@ namespace Northwind.Web.Controllers
             return await GetWholeOrder(order.OrderId);
         }
 
-
-
-        /// <summary>
-        /// Add an order including its order details
-        /// </summary>
-        /// <returns>Add order</returns> 
-        [HttpPost("")]
-
-        [ProducesResponseType(typeof(Order), StatusCodes.Status200OK)]
-        public async Task<IActionResult> AddOrder(Order order)
-        {
-            await dataService.OrderRepository.AddOrderAsync(order);
-            return await GetWholeOrder(order.OrderId);
-        }
+        
 
 
         /// <summary>

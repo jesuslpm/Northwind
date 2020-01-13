@@ -100,6 +100,18 @@ namespace Northwind.Entities
             return order;
         }
 
+        public async Task<IList<Order>> GetOrdersByCustIDAsync(string customerId)
+        {
+
+            var orders = await this.DataService.OrderRepository
+                              .Query(OrderProjections.WithTotal)
+                              .Where(nameof(Order.CustomerId), OperatorLite.Equals, customerId)
+                              .ToListAsync()
+                              .ConfigureAwait(false);
+
+            
+            return orders;
+        }
         public IQueryLite<Order> SearchQuery(OrderCriteria criteria)
         {
             var query = this.Query(OrderProjections.WithTotal);

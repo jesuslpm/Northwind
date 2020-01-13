@@ -230,48 +230,24 @@
             }
           }
         }
-      },
-      "post": {
-        "tags": [
-          "Orders"
-        ],
-        "summary": "Add an order including its order details",
-        "operationId": "Orders_AddOrder",
-        "consumes": [
-          "application/json-patch+json",
-          "application/json",
-          "text/json",
-          "application/*+json"
-        ],
-        "parameters": [
-          {
-            "name": "order",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/Order"
-            },
-            "x-nullable": false
-          }
-        ],
-        "responses": {
-          "200": {
-            "x-nullable": false,
-            "description": "Add order",
-            "schema": {
-              "$ref": "#/definitions/Order"
-            }
-          }
-        }
       }
     },
-    "/orders/getallorders": {
+    "/orders/getorderByCustId": {
       "get": {
         "tags": [
           "Orders"
         ],
-        "summary": "Returns All Orders",
-        "operationId": "Orders_GetAllOrders",
+        "summary": "Returns an order including its order details",
+        "operationId": "Orders_GetOrdersByCustID",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "CustomerId",
+            "in": "query",
+            "required": true,
+            "x-nullable": true
+          }
+        ],
         "responses": {
           "200": {
             "x-nullable": false,

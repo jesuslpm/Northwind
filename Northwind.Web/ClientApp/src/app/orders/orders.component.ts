@@ -3,7 +3,7 @@ import { Component, OnInit, OnDestroy,AfterViewInit,ViewChild, TemplateRef  } fr
 import { CatalogClient, Product, 
   Category, Supplier, 
   OrdersClient, Order,CustomersClient, Customer, 
-  EmployeesClient, EmployeeMinimal,
+  EmployeesClient, EmployeeMinimal,ShippersClient, Shipper
 } from '../clients';
 
 import { Subject } from 'rxjs';
@@ -12,6 +12,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { BsModalService, BsModalRef, ModalDirective } from 'ngx-bootstrap/modal';
 import { ToastrService } from 'ngx-toastr';
 import * as moment from 'moment';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-orders',
@@ -21,18 +22,24 @@ import * as moment from 'moment';
 export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
 
   products: Product[] = [];
+  productsArray = [];
   orders: Order[] = [];
   categories: Category[] = [];
   suppliers: Supplier[] = [];
   customers: Customer[] = [];
+  customersArray = [];
   employees: EmployeeMinimal[] = [];
-  // shippers: Shipper[] = [];
+  employeesArray = [];
+  shippers: Shipper[] = [];
+  shippersArray = [];
   dtOptions: any = {};
   dtTrigger: any = new Subject();
   @ViewChild(DataTableDirective,{static: false}) datatableElement: DataTableDirective;
 
   searchForm: FormGroup;
   advanceSearchForm: FormGroup;
+  productForm: FormGroup;
+  orderForm: FormGroup;
   modalRef: BsModalRef;
   currentProduct:any = {};
   minOrderDateTo: any = null;
@@ -45,14 +52,15 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
   isOrderFormSubmitted: Boolean = false;
   orderProducts: any = [];
   netTotal: any = 0;
-  productEditMode: Boolean = false;
   orderEditMode: Boolean = false;
-  
+
+
   constructor(
     private client: CatalogClient,
     private ordersClient: OrdersClient,
     private customerClient: CustomersClient,
     private employeeClient: EmployeesClient,
+    private shipperClient: ShippersClient,
     private fb: FormBuilder,
     private modalService: BsModalService,
     private toastr: ToastrService
@@ -77,13 +85,17 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
               }
             }
           ],
+          // "ordering": false
+          // "columnDefs": [
+          //   { "visible": false, "targets": 0 }
+          // ]
       };
       this.getCustomers();
       this.getProducts();
       this.getCategories();
       this.getSuppliers();
       this.getEmployees();
-      // this.getShippers();
+      this.getShippers();
 
 
       this.searchForm = this.fb.group({
@@ -105,6 +117,29 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
         requiredDateTo: [null],
         shippedDateFrom: [null],
         shippedDateTo: [null],
+      });
+
+      this.orderForm = this.fb.group({
+        orderId:[''],
+        customerId: ['',[Validators.required]],
+        shipName: [''],
+        shipTitle: [''],
+        shipAddress: [''],
+        shipCity: [''],
+        shipRegion: [''],
+        shipPostalCode: [''],
+        shipCountry: [''],
+        shipPhone: [''],
+        shipFax: [''],
+        employeeId: ['',[Validators.required]],
+        shipVia: ['',[Validators.required]],
+        requiredDate: ['',[Validators.required]],
+        shippedDate: ['',[Validators.required]]
+      });
+
+      this.productForm = this.fb.group({
+        productId: ['', [Validators.required]],
+        quantity: ['', [Validators.required]]
       });
   }
 
@@ -136,11 +171,18 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
           .subscribe(customers => {
             if(customers != null) {
               this.customers = customers;
+              this.customersArray = this.generateCustomerArray();
             } else {
               this.toastr.error('Something went wrong!', 'Error!');      
             }
     },(err) => {
       this.toastr.error('Something went wrong!', 'Error!');
+    });
+  }
+  
+  generateCustomerArray() {
+    return this.customers.map(function(c) {
+      return {'id': c['customerId'],'name':c['contactName']};
     });
   }
 
@@ -149,11 +191,18 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
           .subscribe((products) => {
             if(products != null) {
               this.products = products;
+              this.productsArray = this.generateProductArray();
             } else {
               this.toastr.error('Something went wrong!', 'Error!');      
             }
     },(err) => {
       this.toastr.error('Something went wrong!', 'Error!');
+    });
+  }
+
+  generateProductArray() {
+    return this.products.map(function(c) {
+      return {'id': c['productId'],'name':c['productName']};
     });
   }
 
@@ -175,11 +224,17 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
           .subscribe(suppliers => {
             if(suppliers != null) {
               this.suppliers = suppliers;
+              this.shippersArray = this.generateShippersArray();
             } else {
               this.toastr.error('Something went wrong!', 'Error!');      
             }
     },(err) => {
       this.toastr.error('Something went wrong!', 'Error!');
+    });
+  }
+  generateShippersArray() {
+    return this.suppliers.map(function(c) {
+      return {'id': c['companyName'],'name':c['companyName']};
     });
   }
 
@@ -187,8 +242,8 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
     this.employeeClient.getAllEmployees()
           .subscribe(emplyees => {
             if(emplyees != null) {
-              console.log('emplyees', emplyees);
               this.employees = emplyees;
+              this.employeesArray = this.generateEmployeeArray();
             } else {
               this.toastr.error('Something went wrong!', 'Error!');      
             }
@@ -197,8 +252,14 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
-  /*getShippers() {
-    this.shipperClient.getShippers()
+  generateEmployeeArray() {
+    return this.employees.map(function(c) {
+      return {'id': c['employeeId'],'name':c['employeeFullName']};
+    });
+  }
+
+  getShippers() {
+    this.shipperClient.getAllShippers()
           .subscribe(shippers => {
             if(shippers != null) {
               this.shippers = shippers;
@@ -208,7 +269,7 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
     },(err) => {
       this.toastr.error('Something went wrong!', 'Error!');
     });
-  }*/
+  }
 
   rerender(): void {
     this.datatableElement.dtInstance.then((dtInstance: DataTables.Api) => {
@@ -270,8 +331,8 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   advanceSearchSubmit() {
-    
-    if(this.advanceSearchForm.valid) {
+    console.log('this.advanceSearchForm',this.advanceSearchForm.errors);
+    if(this.advanceSearchForm.errors == null) {
       let searchData:any = {};
       searchData = this.advanceSearchForm.value;
       if(searchData.orderDateFrom != null){
@@ -310,14 +371,15 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
       });
       
       searchData.orderId = null;
-      searchData.productIds = [];
-
+      //searchData.productIds = [];
+      console.log('this.advance search', this.advanceSearchForm.value);
       this.ordersClient.search(searchData)
           .subscribe(orders => {
             if(orders != null) {
               this.orders = orders;
               //this.dtTrigger.next();
               this.rerender();
+              this.modalRef.hide();
             } else {
               this.toastr.error('Something went wrong!', 'Error!');      
             }
@@ -326,6 +388,8 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
       });
 
     } else {
+
+      console.log('invalid advance search form', this.advanceSearchForm.errors);
       return false;
     }
     
@@ -358,12 +422,6 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
           orderDateTo: value
         })
     }
-
-    // if(this.advanceSearchForm.value.orderDateTo!= null && moment(this.advanceSearchForm.value.orderDateTo) > moment(this.advanceSearchForm.value.orderAmountFrom)){
-    //   this.advanceSearchForm.patchValue({
-    //     orderDateTo: ''
-    //   })
-    // }
   }
   onOrderDateToChange(value: Date) {
     if(this.isDisabledOrderDateTo) {
@@ -459,7 +517,8 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   onOrderAmountFromChange() {
-    if(this.advanceSearchForm.value.orderAmountFrom != "") {
+    console.log(this.advanceSearchForm.value.orderAmountFrom);
+    if(this.advanceSearchForm.value.orderAmountFrom != null) {
       this.advanceSearchForm.controls['orderAmountTo'].setValidators([Validators.required])
     } else {
       this.advanceSearchForm.controls['orderAmountTo'].setValidators(null)
@@ -475,9 +534,183 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
   amountValidation(group: FormGroup):any {
     let orderAmountFrom = group.get('orderAmountFrom').value;
     let orderAmountTo = group.get('orderAmountTo').value;
-    if(orderAmountTo > orderAmountFrom) {
-      return {'invalidSearchAmountTo': true}
-    } 
-    return null;
+    console.log('orderAmountFrom', orderAmountFrom);
+    console.log('orderAmountTo', orderAmountTo);
+    if(orderAmountFrom != null && orderAmountTo != null) {
+      console.log('in if');
+      if(orderAmountTo < orderAmountFrom) {
+        return {'invalidSearchAmountTo': true}
+      } 
+      return null; 
+    } else {
+      return null; 
+    }
+    
+  }
+
+
+  openOrderModal(template: TemplateRef<any>,isEdit=false, orderId=0) {
+    this.orderEditMode = isEdit;
+    this.clearModalData();
+    if(isEdit) {
+      this.ordersClient.getWholeOrder(orderId)
+        .subscribe((order) => {
+          if(order != null) {
+            this.orderForm.patchValue({
+              orderId: order.orderId,
+              customerId: order.customerId,
+              shipName: order.shipName,
+              shipTitle: order.shipTitle,
+              shipAddress: order.shipAddress,
+              shipCity: order.shipCity,
+              shipRegion: order.shipRegion,
+              shipPostalCode: order.shipPostalCode,
+              shipCountry: order.shipCountry,
+              shipPhone: order.shipPhone,
+              shipFax: order.shipFax,
+              employeeId: order.employeeId,
+              shipVia: order.shipVia,
+              requiredDate: new Date(order.requiredDate),
+              shippedDate: new Date(order.shippedDate)
+            });
+            this.orderProducts = order.details;
+            this.netTotal = order.orderTotal;
+          } else {
+            this.toastr.error('Something went wrong!', 'Error!');      
+          }
+      },(err) => {
+        this.toastr.error('Something went wrong!', 'Error!');
+      });
+    }
+    this.modalRef = this.modalService.show(template, {class: 'modal-xlg right-side-modal', animated: true});
+  }
+
+  getCustomerInfo() {
+    let customerId = this.orderForm.value.customerId;
+    if(customerId != "") {
+      this.customerClient.customerById(customerId)
+        .subscribe((customer) => {
+          if(customer != null) {
+            this.orderForm.patchValue({
+              shipName: customer.contactName,
+              shipTitle: customer.contactTitle,
+              shipAddress: customer.address,
+              shipCity: customer.city,
+              shipRegion: customer.region,
+              shipPostalCode: customer.postalCode,
+              shipCountry: customer.country,
+              shipPhone: customer.phone,
+              shipFax: customer.fax
+            });
+          } else {
+            this.toastr.error('Something went wrong!', 'Error!');      
+          }
+      },(err) => {
+        this.toastr.error('Something went wrong!', 'Error!');
+      });
+    }
+  }
+  
+
+  deleteProduct(idx) {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "Do you want to delete this product?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.value) {
+        this.orderProducts.splice(idx,1);
+        this.calculateNetTotal();
+        Swal.fire(
+          'Deleted!',
+          'Product has been deleted.',
+          'success'
+        )
+      }
+    })
+  }
+
+  onSubmitOrder() {
+    this.isOrderFormSubmitted = true;
+    if(this.orderForm.valid) {
+      let orderData = this.orderForm.value;
+      orderData.orderTotal = this.netTotal;
+      orderData.details = this.orderProducts;
+
+      orderData.employeeId = +orderData.employeeId;
+      orderData.shipVia = +orderData.shipVia;
+      
+      orderData.orderDate = moment().format('YYYY-MM-DD');
+      //var today = moment().format('YYYY-MM-DD');
+      // add order
+      delete orderData["orderId"];
+      this.ordersClient.addOrder(orderData)
+        .subscribe((res) => {
+          if(res != null) {
+            this.toastr.success('Order created successfully!', 'Success!');
+            this.rerender();
+            this.modalRef.hide();
+            this.clearModalData();
+          } else {
+            this.toastr.error('Something went wrong!', 'Error!');      
+          }
+      },(err) => {
+        this.toastr.error('Something went wrong!', 'Error!');
+      });
+    }
+  }
+
+  clearModalData() {
+    this.isOrderFormSubmitted = false;
+    this.orderForm.reset();
+    this.productForm.reset();
+    this.orderProducts = [];
+    this.netTotal = 0;
+    this.isOrderFormSubmitted = false;
+    this.isProductFormSubmitted = false;
+  }
+
+  calculateNetTotal() {
+    this.netTotal = 0;
+    this.orderProducts.map((p,i) => {
+      this.netTotal = this.netTotal + p.lineTotal;
+    });
+  }
+
+  onAddProduct() {
+    this.isProductFormSubmitted = true;
+    if(this.productForm.valid) {
+      let productId = this.productForm.value.productId;
+      //orderProducts
+      this.client.getProductById(productId)
+          .subscribe((product) => {
+            if(product != null) {
+              let orderData:any = {};
+              if(this.orderEditMode) {
+                orderData.orderId = this.orderForm.value.orderId;
+              }
+              orderData.productId= +this.productForm.value.productId;
+              orderData.quantity= this.productForm.value.quantity;
+              orderData.unitPrice = product.unitPrice;
+              orderData.lineTotal = +(product.unitPrice * this.productForm.value.quantity).toFixed(2);
+              orderData.productName = product.productName;
+              
+              
+              this.orderProducts.push(orderData); 
+              
+              this.calculateNetTotal();
+              this.productForm.reset();
+              this.isProductFormSubmitted = false;
+            } else {
+              this.toastr.error('Something went wrong!', 'Error!');      
+            }
+        },(err) => {
+          this.toastr.error('Something went wrong!', 'Error!');
+        });
+    }
   }
 }

@@ -4,7 +4,7 @@
             <div class="">
                 <h2 class="card-title">Orders</h2>
             </div>
-            <div class="px-3 flex-1 mx-auto">
+            <div class="flex-1 ml-auto">
                 <form class="form-inline row" [formGroup]="searchForm" (ngSubmit)="searchFormSubmit()">           
                     <div class="col">
                         <div class="form-group">
@@ -13,7 +13,7 @@
                     </div>
                     <div class="col"><div class="form-group">
                         <select id="customer" name="customerIds" formControlName="customerIds" class="form-control">
-                            <option value="">Customer Name</option>
+                            <option value="">Select Customer Name</option>
                             <option *ngFor="let customer of customers;" [value]="customer.customerId">
                                 {{customer.contactName}}
                             </option>
@@ -31,8 +31,10 @@
                     </div>
                 </form>
             </div>
-            <div class="text-right">
-                <button class='btn btn-primary ml-3 pointer-none'>Advance Search</button>
+            <div class="text-right mt-3 ml-auto w-100">
+                <button type="button" class="btn btn-primary"
+                    (click)="openOrderModal(createOrderTemplate, false)">Create Order</button>
+                <button class='btn btn-primary ml-3' (click)="openAdvanceSearchModal(advanceSearchTemplate)">Advance Search</button>
             </div>
         </div>
     </div>
@@ -87,13 +89,19 @@
                         <div class="row">
                             <label for="customer" class="col-sm-3 col-form-label">Customer</label>
                             <div class="col-sm-9">
-                                <select id="customerIds" name="customerIds" formControlName="customerIds" class="form-control"
+                                <!-- <select id="customerIds" name="customerIds" formControlName="customerIds" class="form-control"
                                     multiple>
                                     <option value="">Customer</option>
                                     <option *ngFor="let customer of customers;" [value]="customer.customerId">
                                         {{customer.contactName}}
                                     </option>
-                                </select>
+                                </select> -->
+                                <ng-select [items]="customersArray"
+                                    bindLabel="name"
+                                    bindValue="id"
+                                    [multiple]="true"
+                                    formControlName="customerIds">
+                                </ng-select>
                             </div>
                         </div>
                     </div>
@@ -101,13 +109,19 @@
                         <div class="row">
                             <label for="employeeIds" class="col-sm-3 col-form-label">Employee</label>
                             <div class="col-sm-9">
-                                <select id="employeeIds" name="employeeIds" formControlName="employeeIds" class="form-control"
+                                <!-- <select id="employeeIds" name="employeeIds" formControlName="employeeIds" class="form-control"
                                     multiple>
                                     <option value="">Employee</option>
                                     <option *ngFor="let employee of employees;" [value]="employee.employeeId">
                                         {{employee.employeeFullName}}
                                     </option>
-                                </select>
+                                </select> -->
+                                <ng-select [items]="employeesArray"
+                                    bindLabel="name"
+                                    bindValue="id"
+                                    [multiple]="true"
+                                    formControlName="employeeIds">
+                                </ng-select>
                             </div>
                         </div>
                     </div>
@@ -115,13 +129,19 @@
                         <div class="row">
                             <label for="shipperIds" class="col-sm-3 col-form-label">Shipper</label>
                             <div class="col-sm-9">
-                                <select id="shipperIds" name="shipperIds" formControlName="shipperIds" class="form-control"
+                                <!-- <select id="shipperIds" name="shipperIds" formControlName="shipperIds" class="form-control"
                                     multiple>
                                     <option value="">Shipper</option>
                                     <option *ngFor="let shipper of shippers;" [value]="shipper.companyName">
                                         {{shipper.companyName}}
                                     </option>
-                                </select>
+                                </select> -->
+                                <ng-select [items]="shippersArray"
+                                    bindLabel="name"
+                                    bindValue="id"
+                                    [multiple]="true"
+                                    formControlName="shipperIds">
+                                </ng-select>
                             </div>
                         </div>
                     </div>
@@ -129,13 +149,20 @@
                         <div class="row">
                             <label for="shipper" class="col-sm-3 col-form-label">Product</label>
                             <div class="col-sm-9">
-                                <select id="productIds" name="productIds" formControlName="productIds" class="form-control"
+                                <!-- <select id="productIds" name="productIds" formControlName="productIds" class="form-control"
                                     multiple>
                                     <option value="">Product</option>
                                     <option *ngFor="let product of products;" [value]="product.productId">
                                         {{product.productName}}
                                     </option>
-                                </select>
+                                </select> -->
+                                
+                                <ng-select [items]="productsArray"
+                                    bindLabel="name"
+                                    bindValue="id"
+                                    [multiple]="true"
+                                    formControlName="productIds">
+                                </ng-select>
                             </div>
                         </div>
                     </div>
@@ -156,13 +183,14 @@
                             <div class="col-sm-3">
                                 <input type="number" placeholder="" formControlName="orderAmountTo"
                                     class="form-control" (change)="onOrderAmountToChange()">
-                                <div *ngIf="advanceSearchForm.hasError('invalidSearchAmountTo')" class="validation-error">
-                                    Order amount to should not be greater than Order amount from.
-                                </div>
                                 <div *ngIf="advanceSearchForm.controls.orderAmountTo?.errors?.required"
                                     class="validation-error">
                                     This field is required
                                 </div>
+                                <div *ngIf="((!advanceSearchForm.controls.orderAmountTo?.errors?.required) && advanceSearchForm.hasError('invalidSearchAmountTo'))" class="validation-error">
+                                    Order amount to should not be less than Order amount from.
+                                </div>
+                                
 
                             </div>
                         </div>
@@ -175,7 +203,7 @@
                                 <label for="categoryId" class="col-form-label">From</label>
                             </div>
                             <div class="col-sm-3">
-                                <input type="text" placeholder="dd/mm/yyyy" formControlName="orderDateFrom"
+                                <input type="text" placeholder="DD/MM/YYYY" formControlName="orderDateFrom"
                                     class="form-control" bsDatepicker
                                     [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', adaptivePosition: true }"
                                     (bsValueChange)="onOrderDateFromChange($event)">
@@ -188,7 +216,7 @@
                                 <label for="categoryId" class="col-form-label">To</label>
                             </div>
                             <div class="col-sm-3">
-                                <input type="text" placeholder="dd/mm/yyyy" formControlName="orderDateTo"
+                                <input type="text" placeholder="DD/MM/YYYY" formControlName="orderDateTo"
                                     class="form-control" bsDatepicker
                                     [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', adaptivePosition: true }"
                                     (bsValueChange)="onOrderDateToChange($event)" [minDate]="minOrderDateTo"
@@ -208,7 +236,7 @@
                                 <label for="categoryId" class="col-form-label">From</label>
                             </div>
                             <div class="col-sm-3">
-                                <input type="text" placeholder="dd/mm/yyyy" formControlName="requiredDateFrom"
+                                <input type="text" placeholder="DD/MM/YYYY" formControlName="requiredDateFrom"
                                     class="form-control" bsDatepicker
                                     [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', adaptivePosition: true }"
                                     (bsValueChange)="onRequiredDateFromChange($event)">
@@ -221,7 +249,7 @@
                                 <label for="categoryId" class="col-form-label">To</label>
                             </div>
                             <div class="col-sm-3">
-                                <input type="text" placeholder="dd/mm/yyyy" formControlName="requiredDateTo"
+                                <input type="text" placeholder="DD/MM/YYYY" formControlName="requiredDateTo"
                                     class="form-control" bsDatepicker
                                     [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', adaptivePosition: true }"
                                     (bsValueChange)="onRequiredDateToChange($event)" [minDate]="minRequiredDateTo"
@@ -241,7 +269,7 @@
                                 <label for="categoryId" class="col-form-label">From</label>
                             </div>
                             <div class="col-sm-3">
-                                <input type="text" placeholder="dd/mm/yyyy" formControlName="shippedDateFrom"
+                                <input type="text" placeholder="DD/MM/YYYY" formControlName="shippedDateFrom"
                                     class="form-control" bsDatepicker
                                     [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', adaptivePosition: true }"
                                     (bsValueChange)="onShippedDateFromChange($event)">
@@ -254,7 +282,7 @@
                                 <label for="categoryId" class="col-form-label">To</label>
                             </div>
                             <div class="col-sm-3">
-                                <input type="text" placeholder="dd/mm/yyyy" formControlName="shippedDateTo"
+                                <input type="text" placeholder="DD/MM/YYYY" formControlName="shippedDateTo"
                                     class="form-control" bsDatepicker
                                     [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', adaptivePosition: true }"
                                      (bsValueChange)="onShippedDateToChange($event)" [minDate]="minShippedDateTo"
@@ -279,5 +307,255 @@
                 </div>
             </div>
         </form>
+    </div>
+</ng-template>
+<ng-template #createOrderTemplate>
+    <div class="modal-header">
+        <h4 *ngIf="!orderEditMode" class="modal-title pull-left">Create Order</h4>
+        <h4 *ngIf="orderEditMode" class="modal-title pull-left">Update Order : {{orderForm.value.orderId}}</h4>
+
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <form class="form-horizontal" [formGroup]="orderForm">
+            <div class="row">
+                <div class="form-group col-sm-12">
+                    <div class="row">
+                        <label for="customerId" class="col-sm-2 col-form-label">Customer</label>
+                        <div class="col-sm-10">
+                            <select id="customerId" name="customerId" formControlName="customerId" class="form-control"
+                                (change)="getCustomerInfo()">
+                                <option value="">Customer</option>
+                                <option *ngFor="let customer of customers;" [value]="customer.customerId">
+                                    {{customer.contactName}}
+                                </option>
+                            </select>
+                            <div *ngIf="isOrderFormSubmitted && orderForm.controls.customerId?.errors?.required"
+                                class="validation-error">
+                                This field is required
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-12">
+                    <div class="row">
+                        <label for="shipName" class="col-sm-2 col-form-label">Contact Name</label>
+                        <div class="col-sm-4">
+                            <input type="text" id="shipName" name="shipName" formControlName="shipName"
+                                class="form-control">
+                        </div>
+                        <label for="shipTitle" class="col-sm-2 col-form-label">Contact Title</label>
+                        <div class="col-sm-4">
+                            <input type="text" id="shipTitle" name="shipTitle" formControlName="shipTitle"
+                                class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-12">
+                    <div class="row">
+                        <label for="shipAddress" class="col-sm-2 col-form-label">Address</label>
+                        <div class="col-sm-10">
+                            <input type="text" id="shipAddress" name="shipAddress" formControlName="shipAddress"
+                                class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-12">
+                    <div class="row">
+                        <label for="shipCity" class="col-sm-2 col-form-label">City</label>
+                        <div class="col-sm-2">
+                            <input type="text" id="shipCity" name="shipCity" formControlName="shipCity"
+                                class="form-control">
+                        </div>
+
+                        <label for="shipRegion" class="col-sm-1 col-form-label">Region</label>
+                        <div class="col-sm-3">
+                            <input type="text" id="shipRegion" name="shipRegion" formControlName="shipRegion"
+                                class="form-control">
+                        </div>
+
+                        <label for="shipPostalCode" class="col-sm-2 col-form-label">Postal Code</label>
+                        <div class="col-sm-2">
+                            <input type="text" id="shipPostalCode" name="shipPostalCode"
+                                formControlName="shipPostalCode" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-12">
+                    <div class="row">
+                        <label for="shipCountry" class="col-sm-2 col-form-label">Country</label>
+                        <div class="col-sm-2">
+                            <input type="text" id="shipCountry" name="shipCountry" formControlName="shipCountry"
+                                class="form-control">
+                        </div>
+
+                        <label for="shipPhone" class="col-sm-1 col-form-label">Phone</label>
+                        <div class="col-sm-3">
+                            <input type="text" id="shipPhone" name="shipPhone" formControlName="shipPhone"
+                                class="form-control">
+                        </div>
+
+                        <label for="shipFax" class="col-sm-2 col-form-label">Fax</label>
+                        <div class="col-sm-2">
+                            <input type="text" id="shipFax" name="shipFax" formControlName="shipFax"
+                                class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-12">
+                    <div class="row">
+                        <label for="employeeId" class="col-sm-2 col-form-label">Employee</label>
+                        <div class="col-sm-10">
+                            <select id="employeeId" name="employeeId" formControlName="employeeId" class="form-control">
+                                <option value="">Employee</option>
+                                <option *ngFor="let employee of employees;" [value]="employee.employeeId">
+                                    {{employee.employeeFullName}}
+                                </option>
+                            </select>
+                            <div *ngIf="isOrderFormSubmitted && orderForm.controls.employeeId?.errors?.required"
+                                class="validation-error">
+                                This field is required
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-12">
+                    <div class="row">
+                        <label for="shipVia" class="col-sm-2 col-form-label">Shipper</label>
+                        <div class="col-sm-10">
+                            <select id="shipVia" name="shipVia" formControlName="shipVia" class="form-control">
+                                <option value="">Shipper</option>
+                                <option *ngFor="let shipper of shippers;" [value]="shipper.shipperId">
+                                    {{shipper.companyName}}
+                                </option>
+                            </select>
+                            <div *ngIf="isOrderFormSubmitted && orderForm.controls.shipVia?.errors?.required"
+                                class="validation-error">
+                                This field is required
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group col-sm-12">
+                    <div class="row">
+                        <label for="categoryId" class="col-sm-2 col-form-label">Dates</label>
+                        <div class="col-sm-2">
+                            <label for="categoryId" class="col-form-label">Required Date</label>
+                        </div>
+                        <div class="col-sm-3">
+                            <input type="text" placeholder="dd/mm/yyyy" formControlName="requiredDate"
+                                class="form-control" bsDatepicker
+                                [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', adaptivePosition: true }">
+                            <div *ngIf="isOrderFormSubmitted && orderForm.controls.requiredDate?.errors?.required"
+                                class="validation-error">
+                                This field is required
+                            </div>
+                        </div>
+                        <div class="col-sm-2">
+                            <label for="categoryId" class="col-form-label">Shipped Date</label>
+                        </div>
+                        <div class="col-sm-3">
+                            <input type="text" placeholder="dd/mm/yyyy" formControlName="shippedDate"
+                                class="form-control" bsDatepicker
+                                [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', adaptivePosition: true }"
+                                (bsValueChange)="onOrderDateToChange($event)" [minDate]="minOrderDateTo">
+                            <div *ngIf="isOrderFormSubmitted && orderForm.controls.shippedDate?.errors?.required"
+                                class="validation-error">
+                                This field is required
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="tab-outer">
+            <tabset>
+                <tab heading="Order Details" id="tab1">
+                    <div class="inner-tab">
+                        <form class="form-horizontal" [formGroup]="productForm">
+                            <div class="row">
+                                <div class="form-group col-sm-12">
+                                    <div class="row">
+                                        <label for="productId" class="col-sm-1 col-form-label">Product</label>
+                                        <div class="col-sm-4">
+                                            <select id="product" name="productId" formControlName="productId"
+                                                class="form-control">
+                                                <option value="">Product</option>
+                                                <option *ngFor="let product of products;" [value]="product.productId">
+                                                    {{product.productName}}
+                                                </option>
+                                            </select>
+                                            <div *ngIf="isProductFormSubmitted && productForm.controls.productId?.errors?.required"
+                                                class="validation-error">
+                                                This field is required
+                                            </div>
+                                        </div>
+                                        <label for="quantity" class="col-sm-1 col-form-label">Quantity</label>
+                                        <div class="col-sm-2">
+                                            <input type="number" id="quantity" name="quantity"
+                                                formControlName="quantity" min="0" step="1" class="form-control">
+                                            <div *ngIf="isProductFormSubmitted && productForm.controls.quantity?.errors?.required"
+                                                class="validation-error">
+                                                This field is required
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <button type="submit" class="btn btn-primary"
+                                                (click)="onAddProduct()">Add</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <div>
+                            <table *ngIf="orderProducts && orderProducts.length > 0" id="table-order-detail"
+                                class="row-border hover order-detail-table">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Quantity</th>
+                                        <th>Unit Price</th>
+                                        <th>Total Price</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody *ngIf="orderProducts && orderProducts.length > 0">
+                                    <tr *ngFor="let p of orderProducts;let idx = index">
+                                        <td>{{p.productName}}</td>
+                                        <td>{{p.quantity}}</td>
+                                        <td>{{p.unitPrice | number : '1.2-2'}}</td>
+                                        <td>{{p.lineTotal | number : '1.2-2'}}</td>
+                                        <td>
+                                            <button class='btn btn-primary' (click)="editProduct(idx)">Edit</button>
+                                            <button class='btn btn-primary offset-1'
+                                                (click)="deleteProduct(idx)">Delete</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </tab>
+                <tab heading="Basic Title 1">
+
+                </tab>
+            </tabset>
+        </div>
+        <div class="form-group form-group-sm col-sm-12 order-total-outer">
+            <div class="row">
+                <div class="col-sm-4">
+                    <label>Order total: ${{netTotal}}</label>
+                </div>
+                <div class="col-md-2 offset-6">
+                    <button type="button" class="btn btn-primary" (click)="onSubmitOrder()">Save Data</button>
+                    <!-- <button *ngIf="orderEditMode" type="button" class="btn btn-primary" (click)="onUpdateOrder()">Save Data</button> -->
+
+                </div>
+            </div>
+        </div>
+
     </div>
 </ng-template>

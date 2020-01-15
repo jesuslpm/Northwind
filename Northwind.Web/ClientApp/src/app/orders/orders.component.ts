@@ -16,6 +16,7 @@ import Swal from 'sweetalert2';
 import { validatePostiveInteger, validatePositiveDecimal } from '../custom-validations/validations';
 import { ExportService } from '../services/export.service';
 import { FilterPipe } from '../pipes/filter.pipe';
+import { TabDirective } from 'ngx-bootstrap/tabs';
 
 @Component({
   selector: 'app-orders',
@@ -27,6 +28,8 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
   products: Product[] = [];
   productsArray = [];
   orders: Order[] = [];
+  currentOrder: Order;
+  orderFromSameCustomer: Order[] = [];
   allOrders: Order[] = [];
   categories: Category[] = [];
   suppliers: Supplier[] = [];
@@ -305,7 +308,7 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
 
   searchFormSubmit() {
     if(this.searchForm.valid) {
-      let searchData: any = {};
+      let searchData: OrderCriteria = {};
       if(this.searchForm.value.customerIds != "") {
         searchData.customerIds = [this.searchForm.value.customerIds];
       } else {
@@ -319,9 +322,9 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
       }
       
       if(this.searchForm.value.orderDateFrom != null) {
-        searchData.orderDateFrom = moment(this.searchForm.value.orderDateFrom).format("YYYY-MM-DD");
+        //searchData.orderDateFrom = moment(this.searchForm.value.orderDateFrom).format("YYYY-MM-DD");
         //searchData.orderDateFrom = new Date(this.searchForm.value.orderDateFrom);
-        searchData.orderDateFrom = new Date();
+        //searchData.orderDateFrom = new Date();
 
         searchData.orderDateFrom = new Date((<Date>this.searchForm.value.orderDateFrom).setHours(0, 0, 0, 0));
         searchData.orderDateTo = searchData.orderDateFrom;
@@ -368,28 +371,33 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
   advanceSearchSubmit() {
     this.advanceSearchSubmitted = true;
     if(this.advanceSearchForm.errors == null) {
-      let searchData:any = {};
+      let searchData:OrderCriteria = {};
       searchData = this.advanceSearchForm.value;
       if(searchData.orderDateFrom != null){
-        searchData.orderDateFrom = moment(searchData.orderDateFrom).format("YYYY-MM-DD");
+        //searchData.orderDateFrom = moment(searchData.orderDateFrom).format("YYYY-MM-DD");
+        searchData.orderDateFrom = new Date((<Date>searchData.orderDateFrom).setHours(0, 0, 0, 0));
       }
       if(searchData.orderDateTo != null){
-        searchData.orderDateTo = moment(searchData.orderDateTo).format("YYYY-MM-DD");
+        //searchData.orderDateTo = moment(searchData.orderDateTo).format("YYYY-MM-DD");
+        searchData.orderDateTo = new Date((<Date>searchData.orderDateTo).setHours(0, 0, 0, 0));
       }
       if(searchData.requiredDateFrom != null){
-        searchData.requiredDateFrom = moment(searchData.requiredDateFrom).format("YYYY-MM-DD");
+        //searchData.requiredDateFrom = moment(searchData.requiredDateFrom).format("YYYY-MM-DD");
+        searchData.requiredDateFrom = new Date((<Date>searchData.requiredDateFrom).setHours(0, 0, 0, 0));
       }
       if(searchData.requiredDateTo != null){
-        searchData.requiredDateTo = moment(searchData.requiredDateTo).format("YYYY-MM-DD");
+        //searchData.requiredDateTo = moment(searchData.requiredDateTo).format("YYYY-MM-DD");
+        searchData.requiredDateTo = new Date((<Date>searchData.requiredDateTo).setHours(0, 0, 0, 0));
       }
       if(searchData.shippedDateFrom != null){
-        searchData.shippedDateFrom = moment(searchData.shippedDateFrom).format("YYYY-MM-DD");
+        //searchData.shippedDateFrom = moment(searchData.shippedDateFrom).format("YYYY-MM-DD");
+        searchData.shippedDateFrom = new Date((<Date>searchData.shippedDateFrom).setHours(0, 0, 0, 0));
       }
       if(searchData.shippedDateTo != null) {
-        searchData.shippedDateTo = moment(searchData.shippedDateTo).format("YYYY-MM-DD");
+        //searchData.shippedDateTo = moment(searchData.shippedDateTo).format("YYYY-MM-DD");
+        searchData.shippedDateTo = new Date((<Date>searchData.shippedDateTo).setHours(0, 0, 0, 0));
       }
 
-      console.log('searchData.customerIds',searchData.customerIds)
       if(searchData.customerIds != null){
         searchData.customerIds = searchData.customerIds.filter(function (el) {
           return el != "";
@@ -398,25 +406,25 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
         searchData.customerIds = [];
       }
       
-      if(searchData.employeeIds != null){
+      if(searchData.employeeIds != null) {
         searchData.employeeIds = searchData.employeeIds.filter(function (el) {
-          return el != "";
+          return el != undefined;
         }); 
       } else {
         searchData.employeeIds = [];
       }
       
-      if(searchData.shipperIds != null){
+      if(searchData.shipperIds != null) {
         searchData.shipperIds = searchData.shipperIds.filter(function (el) {
-          return el != "";
+          return el != undefined;
         });
       } else {
         searchData.shipperIds = [];
       }
       
-      if(searchData.productIds != null){
+      if(searchData.productIds != null) {
         searchData.productIds = searchData.productIds.filter(function (el) {
-          return el != "";
+          return el != undefined;
         });
       } else {
         searchData.productIds = [];
@@ -446,11 +454,9 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
       },(err) => {
         this.toastr.error('Something went wrong!', 'Error!');
       });
-
     } else {
       return false;
     }
-    
   }
 
   openAdvanceSearchModal(template: TemplateRef<any>) {
@@ -458,8 +464,8 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
   }
   onOrderDateFromChange(value: Date) {
     console.log("Order Date From: %o", value);
-    var d = new Date(value.getTime() + value.getTimezoneOffset() * 60 * 1000);
-    console.log("Order date + timeoffset %o", d);
+    // var d = new Date(value.getTime() + value.getTimezoneOffset() * 60 * 1000);
+    // console.log("Order date + timeoffset %o", d);
     // this.advanceSearchForm.patchValue({
     //   orderDateTo: ''
     // })
@@ -616,6 +622,7 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
       this.ordersClient.getWholeOrder(orderId)
         .subscribe((order) => {
           if(order != null) {
+            this.currentOrder = order;
             this.orderForm.patchValue({
               orderId: order.orderId,
               customerId: order.customerId,
@@ -635,7 +642,6 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
             });
             this.orderProducts = order.details;
             this.netTotal = order.orderTotal;
-
 
             var valuesA = this.products.reduce(function(a,c){a[c.productId] = c.productId; return a; }, {});
             var valuesB = this.orderProducts.reduce(function(a,c){a[c.productId] = c.productId; return a; }, {});
@@ -729,9 +735,9 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
 
       orderData.employeeId = +orderData.employeeId;
       orderData.shipVia = +orderData.shipVia;
+      //orderData.orderDate = moment().format('YYYY-MM-DD');
+      orderData.orderDate = new Date();
       
-      orderData.orderDate = moment().format('YYYY-MM-DD');
-      //var today = moment().format('YYYY-MM-DD');
       // add order
       if(this.orderEditMode) {
         // update order
@@ -755,8 +761,7 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
         this.ordersClient.saveWholeOrder(orderData)
           .subscribe((res) => {
             if(res != null) {
-              this.toastr.success('Order created successfully!', 'Success!');  
-              this.rerender();
+              this.toastr.success('Order created successfully!', 'Success!');
               this.modalRef.hide();
               this.clearModalData();
               this.searchFormSubmit();
@@ -911,4 +916,29 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
     return  ((date.getDate() > 9) ? date.getDate() : ('0' + date.getDate())) + '/' + ((date.getMonth() > 8) ? (date.getMonth() + 1) : ('0' + (date.getMonth() + 1))) + '/' + date.getFullYear();
   }
   /** */
+
+  onSelect(data: TabDirective): void {
+    if(data.id == "tab2") {
+      // call api for orders from same customer
+      this.ordersClient.getOrdersByCustID(this.currentOrder.customerId)
+        .subscribe((orders) => {
+          if(orders != null) {
+            console.log('orders', orders);
+            let allOrders: any = orders;
+            allOrders.filter(x => {
+              x.orderDate = this.formatDate(x.orderDate);
+              x.requiredDate = this.formatDate(x.requiredDate);
+              x.shippedDate = this.formatDate(x.shippedDate);
+              x.orderTotal = (x.orderTotal == null) ? 0.00 : x.orderTotal.toFixed(2);
+              x.orderTotal = "$ " + x.orderTotal;
+            })
+            this.orderFromSameCustomer = allOrders;
+          } else {
+            this.toastr.error('Something went wrong!', 'Error!');      
+          }
+      },(err) => {
+        this.toastr.error('Something went wrong!', 'Error!');
+      });
+    }
+  }
 }

@@ -377,3 +377,10 @@ th.crsr-pntr {
   cursor: pointer;
   white-space: nowrap;
 }
+
+.nav-item a{
+  color: #c2c2c2;
+}
+.nav-item.active a{
+  color: #000000;
+}

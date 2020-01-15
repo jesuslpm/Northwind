@@ -59,6 +59,7 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
   netTotal: any = 0;
   orderEditMode: Boolean = false;
   productEditMode: Boolean = false;
+  currentOrderProducts: Product[] = [];
 
   /* New table */
   pageNumber = 1;
@@ -211,6 +212,7 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
           .subscribe((products) => {
             if(products != null) {
               this.products = products;
+              this.currentOrderProducts = products;
               this.productsArray = this.generateProductArray();
             } else {
               this.toastr.error('Something went wrong!', 'Error!');      
@@ -628,6 +630,11 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
             });
             this.orderProducts = order.details;
             this.netTotal = order.orderTotal;
+
+
+            var valuesA = this.products.reduce(function(a,c){a[c.productId] = c.productId; return a; }, {});
+            var valuesB = this.orderProducts.reduce(function(a,c){a[c.productId] = c.productId; return a; }, {});
+            this.currentOrderProducts = this.products.filter(function(c){ return !valuesB[c.productId]}).concat(this.orderProducts.filter(function(c){ return !valuesA[c.productId]}));
           } else {
             this.toastr.error('Something went wrong!', 'Error!');      
           }
@@ -667,14 +674,20 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
 
   editProduct(idx) {
     this.productEditMode = true;
-    let productDetails = this.orderProducts[idx];
-    console.log('productDetails',productDetails);
+    let productDetails:any = {};
+    productDetails = JSON.parse(JSON.stringify(this.orderProducts[idx]));
+    
     this.currentProduct = productDetails;
     this.currentProduct.index = idx;
+    if(productDetails.discount && productDetails.discount != ''){
+      productDetails.discount = (productDetails.discount*100).toFixed(2);
+    } else {
+      productDetails.discount = ''
+    }
     this.productForm.patchValue({
       productId:productDetails.productId,
       quantity: productDetails.quantity,
-      discount: productDetails.discount?(productDetails.discount*100):'',
+      discount: productDetails.discount,
     });
   }
 
@@ -715,20 +728,40 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
       orderData.orderDate = moment().format('YYYY-MM-DD');
       //var today = moment().format('YYYY-MM-DD');
       // add order
-      delete orderData["orderId"];
-      this.ordersClient.saveWholeOrder(orderData)
-        .subscribe((res) => {
-          if(res != null) {
-            this.toastr.success('Order created successfully!', 'Success!');
-            this.rerender();
-            this.modalRef.hide();
-            this.clearModalData();
-          } else {
-            this.toastr.error('Something went wrong!', 'Error!');      
-          }
-      },(err) => {
-        this.toastr.error('Something went wrong!', 'Error!');
-      });
+      if(this.orderEditMode) {
+        // update order
+        this.ordersClient.saveWholeOrder(orderData)
+          .subscribe((res) => {
+            if(res != null) {
+              this.toastr.success('Order updated successfully!', 'Success!');  
+              //this.rerender();
+              this.modalRef.hide();
+              this.clearModalData();
+              this.searchFormSubmit();
+            } else {
+              this.toastr.error('Something went wrong!', 'Error!');      
+            }
+        },(err) => {
+          this.toastr.error('Something went wrong!', 'Error!');
+        });
+      } else {
+        // add order
+        delete orderData["orderId"];
+        this.ordersClient.saveWholeOrder(orderData)
+          .subscribe((res) => {
+            if(res != null) {
+              this.toastr.success('Order created successfully!', 'Success!');  
+              this.rerender();
+              this.modalRef.hide();
+              this.clearModalData();
+              this.searchFormSubmit();
+            } else {
+              this.toastr.error('Something went wrong!', 'Error!');      
+            }
+        },(err) => {
+          this.toastr.error('Something went wrong!', 'Error!');
+        });
+      }
     }
   }
 
@@ -783,9 +816,23 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
                 this.orderProducts.push(orderData); 
               }
               
+              //remove from main array
+             /* let usedProductIndex:any = -1;
+              let productId = this.productForm.value.productId;
+              usedProductIndex=  this.products.findIndex(x => x.productId == productId);
+              console.log('usedProductIndex',usedProductIndex);
+              this.currentOrderProducts.splice(usedProductIndex,1);*/
+
+
+              var valuesA = this.products.reduce(function(a,c){a[c.productId] = c.productId; return a; }, {});
+              var valuesB = this.orderProducts.reduce(function(a,c){a[c.productId] = c.productId; return a; }, {});
+              this.currentOrderProducts = this.products.filter(function(c){ return !valuesB[c.productId]}).concat(this.orderProducts.filter(function(c){ return !valuesA[c.productId]}));
+              
               this.calculateNetTotal();
               this.productForm.reset();
               this.isProductFormSubmitted = false;
+
+              
             } else {
               this.toastr.error('Something went wrong!', 'Error!');      
             }

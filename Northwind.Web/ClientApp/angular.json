@@ -28,8 +28,8 @@
               "node_modules/datatables.net-buttons-dt/css/buttons.dataTables.css",
               "node_modules/ngx-toastr/toastr.css",
               "node_modules/@ng-select/ng-select/themes/default.theme.css",
+              "node_modules/font-awesome/css/font-awesome.css",
               "src/styles.css"
-
             ],
             "scripts": [
               "node_modules/jquery/dist/jquery.js",

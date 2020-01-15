@@ -536,6 +536,61 @@ export class OrdersClient {
     }
 
     /**
+     * Returns an order including its order details
+     * @return an order
+     */
+    getOrdersByCustID(customerId: string | null): Observable<Order[]> {
+        let url_ = this.baseUrl + "/orders/getorderByCustId?";
+        if (customerId === undefined)
+            throw new Error("The parameter 'customerId' must be defined.");
+        else
+            url_ += "CustomerId=" + encodeURIComponent("" + customerId) + "&"; 
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",			
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetOrdersByCustID(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetOrdersByCustID(<any>response_);
+                } catch (e) {
+                    return <Observable<Order[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<Order[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetOrdersByCustID(response: HttpResponseBase): Observable<Order[]> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : <Order[]>JSON.parse(_responseText, this.jsonParseReviver);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<Order[]>(<any>null);
+    }
+
+    /**
      * Gets the order headers that meet the search criteria
      * @return The order
      */

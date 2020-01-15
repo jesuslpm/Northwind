@@ -765,11 +765,12 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
               orderData.quantity = this.productForm.value.quantity;
               orderData.unitPrice = product.unitPrice;
               orderData.discount = this.productForm.value.discount
-              if(orderData.discount && orderData.discount != '') {
+              if (orderData.discount && orderData.discount != '') {
                 orderData.discount = +(+this.productForm.value.discount / 100).toFixed(2);
               } else {
                 orderData.discount = 0;
               }
+
               orderData.lineTotal = +(product.unitPrice * this.productForm.value.quantity);
               orderData.lineTotal = +(orderData.lineTotal - (orderData.lineTotal*(this.productForm.value.discount/100))).toFixed(2);
               orderData.productName = product.productName;

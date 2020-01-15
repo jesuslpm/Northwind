@@ -38,24 +38,66 @@
             </div>
         </div>
     </div>
+    <div class="px-3">    
+        <div class="form-group">
+            show <select [(ngModel)]="perPageLimit" (change)="changePageLimit();">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select> entries
+        </div>
+        <div class="form-group">
+            <button class='btn btn-primary ml-3'
+                            (click)="exportToExcel()">Export
+                            to
+                            Excel</button>
+            <label>Search: </label>
+            <input class="form-control" [(ngModel)]="search" placeholder="Search by Customer Name, Employee or Shipper" type="text"
+                (keyup)="filterOrders();">
+        </div>    
+    </div>
     <div class="card-body position-relative">
         <div class='table-outer'>
-            <table id="sample-table-order" datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger"
-                class="row-border hover upgraded table-bordered">
+            <table id="sample-table-order" class="table table-striped upgraded">
                 <thead>
                     <tr>
-                        <th>Order Id</th>
-                        <th>Customer Name</th>
-                        <th>Employee</th>
-                        <th>Shipper</th>
-                        <th>Order Date</th>
-                        <th>Required Date</th>
-                        <th>Shipped Date</th>
-                        <th>Order Total $</th>
+                        <th class="crsr-pntr" (click)="sortOrder('orderId')">
+                            Order Id <i *ngIf="sortingColumn === 'orderId'"
+                                class="fa {{sortType === '' || sortType === 'ASC' ? 'fa-sort-amount-asc' : 'fa-sort-amount-desc'}}"></i>
+                        </th>
+                        <th class="crsr-pntr" (click)="sortOrder('customerName')">
+                            Customer Name <i *ngIf="sortingColumn === 'customerName'"
+                                class="fa {{sortType === '' || sortType === 'ASC' ? 'fa-sort-amount-asc' : 'fa-sort-amount-desc'}}"></i>
+                        </th>
+                        <th class="crsr-pntr" (click)="sortOrder('employeeFullName')">
+                            Employee <i *ngIf="sortingColumn === 'employeeFullName'"
+                                class="fa {{sortType === '' || sortType === 'ASC' ? 'fa-sort-amount-asc' : 'fa-sort-amount-desc'}}"></i>
+                        </th>
+                        <th class="crsr-pntr" (click)="sortOrder('shipName')">
+                            Shipper <i *ngIf="sortingColumn === 'shipName'"
+                                class="fa {{sortType === '' || sortType === 'ASC' ? 'fa-sort-amount-asc' : 'fa-sort-amount-desc'}}"></i>
+                        </th>
+                        <th class="crsr-pntr" (click)="sortOrder('orderDate')">
+                            Order Date <i *ngIf="sortingColumn === 'orderDate'"
+                                class="fa {{sortType === '' || sortType === 'ASC' ? 'fa-sort-amount-asc' : 'fa-sort-amount-desc'}}"></i>
+                        </th>
+                        <th class="crsr-pntr" (click)="sortOrder('requiredDate')">
+                            Required Date <i *ngIf="sortingColumn === 'requiredDate'"
+                                class="fa {{sortType === '' || sortType === 'ASC' ? 'fa-sort-amount-asc' : 'fa-sort-amount-desc'}}"></i>
+                        </th>
+                        <th class="crsr-pntr" (click)="sortOrder('shippedDate')">
+                            Shipped Date <i *ngIf="sortingColumn === 'shippedDate'"
+                                class="fa {{sortType === '' || sortType === 'ASC' ? 'fa-sort-amount-asc' : 'fa-sort-amount-desc'}}"></i>
+                        </th>
+                        <th class="crsr-pntr" (click)="sortOrder('orderTotal')">
+                            Order Total $ <i *ngIf="sortingColumn === 'orderTotal'"
+                                class="fa {{sortType === '' || sortType === 'ASC' ? 'fa-sort-amount-asc' : 'fa-sort-amount-desc'}}"></i>
+                        </th>
                         <th>Action</th>
                     </tr>
                 </thead>
-                <tbody *ngIf="orders && orders.length > 0">
+                <!-- <tbody *ngIf="orders && orders.length > 0">
                     <tr *ngFor="let o of orders">
                         <td class="text-right">{{o.orderId}}</td>
                         <td>{{o.customerName}}</td>
@@ -69,8 +111,33 @@
                             <button class='btn btn-primary' (click)="openOrderModal(createOrderTemplate, true, o.orderId)">Edit</button>
                         </td>
                     </tr>
+                </tbody> -->
+                <tbody *ngIf="pageWiseArray && pageWiseArray.length > 0; else noTableData">
+                    <tr *ngFor="let order of pageWiseArray">
+                        <td class="text-right">{{order.orderId}}</td>
+                        <td>{{order.customerName}}</td>
+                        <td>{{order.employeeFullName}}</td>
+                        <td>{{order.shipName}}</td>
+                        <!-- <td>{{order.orderDate | date:'dd/MM/yyyy'}}</td>
+                        <td>{{order.requiredDate | date:'dd/MM/yyyy'}}</td>
+                        <td>{{order.shippedDate | date:'dd/MM/yyyy'}}</td> -->
+                        <td>{{order.orderDate}}</td>
+                        <td>{{order.requiredDate}}</td>
+                        <td>{{order.shippedDate}}</td>
+                        <td class="text-right"> {{order.orderTotal}}</td>
+                        <td>
+                            <button class='btn btn-primary pointer-none'>Edit</button>
+                        </td>
+                    </tr>
                 </tbody>
+                <ng-template #noTableData>
+                    No data available
+                </ng-template>
             </table>
+            <div class="rightAlign" *ngIf="orders.length > 0">
+                <pagination [boundaryLinks]="true" [totalItems]="orders.length" [itemsPerPage]="perPageLimit"
+                    [maxSize]="100" (pageChanged)="pageChanged($event)" class="pagination-sm"></pagination>
+            </div>
         </div>
     </div>
 </div>
@@ -326,7 +393,7 @@
             <div class="row">
                 <div class="form-group col-sm-12">
                     <div class="row">
-                        <label for="customerId" class="col-sm-2 col-form-label">Customer</label>
+                        <label for="customerId" class="col-sm-2 col-form-label">Customer<span class="required">*</span></label>
                         <div class="col-sm-10">
                             <select id="customerId" name="customerId" formControlName="customerId" class="form-control"
                                 (change)="getCustomerInfo()" placeholder="Select Customer">
@@ -347,12 +414,12 @@
                         <label for="shipName" class="col-sm-2 col-form-label">Contact Name</label>
                         <div class="col-sm-4">
                             <input type="text" id="shipName" name="shipName" formControlName="shipName"
-                                class="form-control">
+                                class="form-control" maxlength="40">
                         </div>
                         <label for="shipTitle" class="col-sm-2 col-form-label">Contact Title</label>
                         <div class="col-sm-4">
                             <input type="text" id="shipTitle" name="shipTitle" formControlName="shipTitle"
-                                class="form-control">
+                                class="form-control" maxlength="30">
                         </div>
                     </div>
                 </div>
@@ -361,7 +428,7 @@
                         <label for="shipAddress" class="col-sm-2 col-form-label">Address</label>
                         <div class="col-sm-10">
                             <input type="text" id="shipAddress" name="shipAddress" formControlName="shipAddress"
-                                class="form-control">
+                                class="form-control" maxlength="60">
                         </div>
                     </div>
                 </div>
@@ -370,19 +437,19 @@
                         <label for="shipCity" class="col-sm-2 col-form-label">City</label>
                         <div class="col-sm-2">
                             <input type="text" id="shipCity" name="shipCity" formControlName="shipCity"
-                                class="form-control">
+                                class="form-control" maxlength="15">
                         </div>
 
                         <label for="shipRegion" class="col-sm-1 col-form-label">Region</label>
                         <div class="col-sm-3">
                             <input type="text" id="shipRegion" name="shipRegion" formControlName="shipRegion"
-                                class="form-control">
+                                class="form-control" maxlength="15">
                         </div>
 
                         <label for="shipPostalCode" class="col-sm-2 col-form-label">Postal Code</label>
                         <div class="col-sm-2">
                             <input type="text" id="shipPostalCode" name="shipPostalCode"
-                                formControlName="shipPostalCode" class="form-control">
+                                formControlName="shipPostalCode" class="form-control" maxlength="10">
                         </div>
                     </div>
                 </div>
@@ -391,28 +458,28 @@
                         <label for="shipCountry" class="col-sm-2 col-form-label">Country</label>
                         <div class="col-sm-2">
                             <input type="text" id="shipCountry" name="shipCountry" formControlName="shipCountry"
-                                class="form-control">
+                                class="form-control" maxlength="15">
                         </div>
 
                         <label for="shipPhone" class="col-sm-1 col-form-label">Phone</label>
                         <div class="col-sm-3">
                             <input type="text" id="shipPhone" name="shipPhone" formControlName="shipPhone"
-                                class="form-control">
+                                class="form-control" maxlength="24">
                         </div>
 
                         <label for="shipFax" class="col-sm-2 col-form-label">Fax</label>
                         <div class="col-sm-2">
                             <input type="text" id="shipFax" name="shipFax" formControlName="shipFax"
-                                class="form-control">
+                                class="form-control" maxlength="24">
                         </div>
                     </div>
                 </div>
                 <div class="form-group col-sm-12">
                     <div class="row">
-                        <label for="employeeId" class="col-sm-2 col-form-label">Employee</label>
+                        <label for="employeeId" class="col-sm-2 col-form-label">Employee<span class="required">*</span></label>
                         <div class="col-sm-10">
                             <select id="employeeId" name="employeeId" formControlName="employeeId" class="form-control">
-                                <option value="">Employee</option>
+                                <option value="">Select Employee</option>
                                 <option *ngFor="let employee of employees;" [value]="employee.employeeId">
                                     {{employee.employeeFullName}}
                                 </option>
@@ -426,10 +493,10 @@
                 </div>
                 <div class="form-group col-sm-12">
                     <div class="row">
-                        <label for="shipVia" class="col-sm-2 col-form-label">Shipper</label>
+                        <label for="shipVia" class="col-sm-2 col-form-label">Shipper<span class="required">*</span></label>
                         <div class="col-sm-10">
                             <select id="shipVia" name="shipVia" formControlName="shipVia" class="form-control">
-                                <option value="">Shipper</option>
+                                <option value="">Select Shipper</option>
                                 <option *ngFor="let shipper of shippers;" [value]="shipper.shipperId">
                                     {{shipper.companyName}}
                                 </option>
@@ -446,7 +513,7 @@
                     <div class="row">
                         <label for="categoryId" class="col-sm-2 col-form-label">Dates</label>
                         <div class="col-sm-2">
-                            <label for="categoryId" class="col-form-label">Required Date</label>
+                            <label for="categoryId" class="col-form-label">Required Date<span class="required">*</span></label>
                         </div>
                         <div class="col-sm-3">
                             <input type="text" placeholder="DD/MM/YYYY" formControlName="requiredDate"
@@ -458,7 +525,7 @@
                             </div>
                         </div>
                         <div class="col-sm-2">
-                            <label for="categoryId" class="col-form-label">Shipped Date</label>
+                            <label for="categoryId" class="col-form-label">Shipped Date<span class="required">*</span></label>
                         </div>
                         <div class="col-sm-3">
                             <input type="text" placeholder="DD/MM/YYYY" formControlName="shippedDate"
@@ -481,12 +548,12 @@
                         <form class="form-horizontal" [formGroup]="productForm">
                             <div class="row">
                                 <div class="form-group col-sm-12">
-                                    <div class="row">
-                                        <label for="productId" class="col-sm-1 col-form-label">Product</label>
-                                        <div class="col-sm-3">
+                                    <div class="d-flex white-label">
+                                        <label for="productId" class="">Product<span class="required">*</span></label>
+                                        <div class="px-3">
                                             <select id="product" name="productId" formControlName="productId"
                                                 class="form-control">
-                                                <option value="">Product</option>
+                                                <option value="">Select Product</option>
                                                 <option *ngFor="let product of products;" [value]="product.productId">
                                                     {{product.productName}}
                                                 </option>
@@ -496,8 +563,8 @@
                                                 This field is required
                                             </div>
                                         </div>
-                                        <label for="quantity" class="col-sm-1 col-form-label">Quantity</label>
-                                        <div class="col-sm-2">
+                                        <label for="quantity" class="">Quantity<span class="required">*</span></label>
+                                        <div class="px-3">
                                             <input type="number" id="quantity" name="quantity"
                                                 formControlName="quantity" min="1" step="1" class="form-control">
                                             <div *ngIf="isProductFormSubmitted && productForm.controls.quantity?.errors?.required"
@@ -506,11 +573,11 @@
                                             </div>
                                             <div *ngIf="isProductFormSubmitted && (!(productForm.controls.quantity?.errors?.required) && (productForm.controls.quantity?.errors?.positiveInteger))"
                                                 class="validation-error">
-                                                Invalid Quantity value
+                                                Invalid quantity value
                                             </div>
                                         </div>
-                                        <label for="discount" class="col-sm-1 col-form-label">Discount</label>
-                                        <div class="col-sm-2">
+                                        <label for="discount" class="">Discount (%)</label>
+                                        <div class="px-3">
                                             <input type="number" id="discount" name="discount"
                                                 formControlName="discount" min="0" step="1" class="form-control">
                                             <div *ngIf="isProductFormSubmitted && productForm.controls.discount?.errors?.required"
@@ -519,10 +586,10 @@
                                             </div>
                                             <div *ngIf="isProductFormSubmitted && (!(productForm.controls.discount?.errors?.required) && (productForm.controls.discount?.errors?.positiveDecimal))"
                                                 class="validation-error">
-                                                Invalid Discount value
+                                                Invalid discount value
                                             </div>
                                         </div>
-                                        <div class="col-sm-1">
+                                        <div class="">
                                             <button type="submit" class="btn btn-primary"
                                                 (click)="onAddProduct()">{{productEditMode != true?'Add':'Update'}}</button>
                                         </div>
@@ -532,23 +599,23 @@
                         </form>
                         <div>
                             <table *ngIf="orderProducts && orderProducts.length > 0" id="table-order-detail"
-                                class="row-border hover order-detail-table">
+                                class="row-border hover fs-14 fs-14-table light-border table text-right">
                                 <thead>
                                     <tr>
-                                        <th>Product</th>
+                                        <th class="text-left">Product</th>
                                         <th>Quantity</th>
-                                        <th>Unit Price</th>
-                                        <th>Total Price</th>
-                                        <th>Action</th>
+                                        <th>Unit Price ($)</th>
+                                        <th>Total Price ($)</th>
+                                        <th class="text-center">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody *ngIf="orderProducts && orderProducts.length > 0">
                                     <tr *ngFor="let p of orderProducts;let idx = index">
-                                        <td>{{p.productName}}</td>
+                                        <td class="text-left">{{p.productName}}</td>
                                         <td>{{p.quantity}}</td>
-                                        <td>{{p.unitPrice | number : '1.2-2'}}</td>
-                                        <td>{{p.lineTotal | number : '1.2-2'}}</td>
-                                        <td>
+                                        <td>$ {{p.unitPrice | number : '1.2-2'}}</td>
+                                        <td>$ {{p.lineTotal | number : '1.2-2'}}</td>
+                                        <td class="text-center">
                                             <button class='btn btn-primary' (click)="editProduct(idx)">Edit</button>
                                             <button class='btn btn-primary offset-1'
                                                 (click)="deleteProduct(idx)">Delete</button>
@@ -564,12 +631,12 @@
                 </tab>
             </tabset>
         </div>
-        <div class="form-group form-group-sm col-sm-12 order-total-outer">
+        <div class="form-group form-group-sm col-sm-12 order-total-outer px-0">
             <div class="row">
-                <div class="col-sm-4">
-                    <label>Order total: ${{netTotal}}</label>
+                <div class="col-8">
+                    <label>Total Order: $ {{netTotal | number : '1.2-2'}}</label>
                 </div>
-                <div class="col-md-2 offset-6">
+                <div class="col text-right">
                     <button type="button" class="btn btn-primary" (click)="onSubmitOrder()" [disabled]="orderProducts && orderProducts.length == 0">Save Data</button>
                 </div>
             </div>

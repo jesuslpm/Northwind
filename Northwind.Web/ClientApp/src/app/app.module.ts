@@ -22,6 +22,8 @@ import { ModalModule } from 'ngx-bootstrap/modal';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { TabsModule } from 'ngx-bootstrap/tabs';
+import { PaginationModule } from 'ngx-bootstrap/pagination';
+import { AngularFontAwesomeModule } from 'angular-font-awesome';
 
 @NgModule({
   declarations: [
@@ -51,6 +53,7 @@ import { TabsModule } from 'ngx-bootstrap/tabs';
     BsDatepickerModule.forRoot(),
     NgSelectModule,
     TabsModule.forRoot(),
+    PaginationModule.forRoot(),
   ],
   providers: [
     CatalogClient,

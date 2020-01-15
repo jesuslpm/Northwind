@@ -41,6 +41,7 @@ code {
 
 .validation-error {
   color: red;
+  font-size: 14px;
 }
 
 .modal-xlg{
@@ -62,6 +63,7 @@ datatable-header, datatable-body, datatable-footer{
 
 .order-detail-table tr{
   border-bottom: 1px solid lightgray;
+  font-size: 14px;
 }
 .order-detail-table td {
   padding: 4px;
@@ -344,3 +346,23 @@ table.upgraded.dataTable {
 .ng-dropdown-panel .ng-dropdown-panel-items .ng-option {
   font-size: 14px;
 } 
+
+
+.white-label label {
+  white-space: nowrap;
+  padding-top: 6px;
+  margin-bottom: 0;
+}
+label{
+  font-size: 14px;  
+}
+.fs-14-table tr td,
+.fs-14-table tr th{
+font-size: 14px !important;
+}
+.light-border {
+  border: 1px solid #ddd;
+}
+.required {
+  color: red;
+}

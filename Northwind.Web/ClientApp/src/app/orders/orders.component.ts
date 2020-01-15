@@ -14,6 +14,8 @@ import { ToastrService } from 'ngx-toastr';
 import * as moment from 'moment';
 import Swal from 'sweetalert2';
 import { validatePostiveInteger, validatePositiveDecimal } from '../custom-validations/validations';
+import { ExportService } from '../services/export.service';
+import { FilterPipe } from '../pipes/filter.pipe';
 
 @Component({
   selector: 'app-orders',
@@ -25,6 +27,7 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
   products: Product[] = [];
   productsArray = [];
   orders: Order[] = [];
+  allOrders: Order[] = [];
   categories: Category[] = [];
   suppliers: Supplier[] = [];
   customers: Customer[] = [];
@@ -57,6 +60,18 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
   orderEditMode: Boolean = false;
   productEditMode: Boolean = false;
 
+  /* New table */
+  pageNumber = 1;
+  perPageLimit = 10;
+  pageWiseArray = [];
+  sortingColumn:string = "";
+  sortType:string = "";
+  search:string = "";
+  dataTableHeaders=['Order Id', 'Customer Name', 'Employee', 'Shipper',
+  'Order Date', 'Required Date', 'Shipped Date', 'Order Total $'];
+  dataColumns=['orderId', 'customerName', 'employeeFullName', 'shipName',
+  'orderDate', 'requiredDate', 'shippedDate', 'orderTotal'];
+  /* */
   constructor(
     private client: CatalogClient,
     private ordersClient: OrdersClient,
@@ -65,7 +80,9 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
     private shipperClient: ShippersClient,
     private fb: FormBuilder,
     private modalService: BsModalService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private exportService:ExportService,
+    public filterPipe:FilterPipe
   ) { }
 
   ngOnInit() {
@@ -302,7 +319,7 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
       if(this.searchForm.value.orderDateFrom != null) {
         searchData.orderDateFrom = moment(this.searchForm.value.orderDateFrom).format("YYYY-MM-DD");
         //searchData.orderDateFrom = new Date(this.searchForm.value.orderDateFrom);
-        // searchData.orderDateFrom = new Date();
+        searchData.orderDateFrom = new Date();
         searchData.orderDateTo = searchData.orderDateFrom;
       } else {
         searchData.orderDateFrom =  null;
@@ -322,9 +339,17 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
       this.ordersClient.search(searchData)
           .subscribe(orders => {
             if(orders != null) {
-              this.orders = orders;
-              //this.dtTrigger.next();
-              this.rerender();
+              let allOrders: any = orders;
+              allOrders.filter(x => {
+                x.orderDate = this.formatDate(x.orderDate);
+                x.requiredDate = this.formatDate(x.requiredDate);
+                x.shippedDate = this.formatDate(x.shippedDate);
+                x.orderTotal = (x.orderTotal == null) ? 0.00 : x.orderTotal.toFixed(2);
+                x.orderTotal = "$ " + x.orderTotal;
+              })
+              this.orders = allOrders;
+              this.allOrders = this.orders;
+              this.changePage();
             } else {
               this.toastr.error('Something went wrong!', 'Error!');      
             }
@@ -399,9 +424,17 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
       this.ordersClient.search(searchData)
           .subscribe(orders => {
             if(orders != null) {
-              this.orders = orders;
-              //this.dtTrigger.next();
-              this.rerender();
+              let allOrders: any = orders;
+              allOrders.filter(x => {
+                x.orderDate = this.formatDate(x.orderDate);
+                x.requiredDate = this.formatDate(x.requiredDate);
+                x.shippedDate = this.formatDate(x.shippedDate);
+                x.orderTotal = (x.orderTotal == null) ? 0.00 : x.orderTotal.toFixed(2);
+                x.orderTotal = "$ " + x.orderTotal;
+              })
+              this.orders = allOrders;
+              this.allOrders = this.orders;
+              this.changePage();
               this.modalRef.hide();
             } else {
               this.toastr.error('Something went wrong!', 'Error!');      
@@ -658,6 +691,8 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
       if (result.value) {
         this.orderProducts.splice(idx,1);
         this.calculateNetTotal();
+        this.productForm.reset();
+        this.productEditMode = false;
         Swal.fire(
           'Deleted!',
           'Product has been deleted.',
@@ -732,6 +767,8 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
               orderData.discount = this.productForm.value.discount
               if(orderData.discount && orderData.discount != '') {
                 orderData.discount = +(+this.productForm.value.discount / 100).toFixed(2);
+              } else {
+                orderData.discount = 0;
               }
               orderData.lineTotal = +(product.unitPrice * this.productForm.value.quantity);
               orderData.lineTotal = +(orderData.lineTotal - (orderData.lineTotal*(this.productForm.value.discount/100))).toFixed(2);
@@ -756,4 +793,69 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
         });
     }
   }
+
+  /* new table*/
+  // changePage() - Display records according to page.
+   changePage(){
+    this.pageWiseArray = [];
+    for(let j=((this.perPageLimit * this.pageNumber) - this.perPageLimit); 
+            j<(this.perPageLimit * this.pageNumber); 
+            j++){
+      if(j < this.orders.length)
+        this.pageWiseArray.push(this.orders[j]);
+    }
+  }
+
+  //changePageLimit()
+  changePageLimit(){
+    this.changePage();
+  }
+
+
+  // sortUser() - Sort Orders according to column.
+  sortOrder(columnName: string) {
+    if (!this.sortingColumn || this.sortingColumn != columnName) {
+      this.sortType = "ASC";
+    }
+    this.sortingColumn = columnName;
+    if (!this.sortType || this.sortType === "DESC") {
+      this.orders.sort((a, b) => (a[columnName] > b[columnName]) ? 1 : -1);
+      this.sortType = "ASC";
+    } else {
+      this.orders.sort((a, b) => (a[columnName] > b[columnName]) ? -1 : 1);
+      this.sortType = "DESC";
+    }
+    this.changePage();
+  }
+
+
+    // pageChanged() - Event is fired when page is changed.
+  pageChanged(event) {
+    this.pageNumber = event.page;
+    this.changePage();
+  }
+
+  //exportToExcel => export Data to excel
+  exportToExcel(){
+    this.exportService.exportExcel(this.orders,
+      this.dataTableHeaders,
+      this.dataColumns,
+      "Orders");
+  }
+
+  filterOrders(){
+    if(this.search){
+      this.orders = this.filterPipe.transform(this.allOrders, this.dataColumns, this.search);
+    }else{
+      this.orders = this.allOrders;
+    }
+    this.changePage();
+    this.sortOrder(this.sortingColumn);
+  }
+
+  formatDate(dateString: any){
+    var date = new Date(dateString);
+    return  ((date.getDate() > 9) ? date.getDate() : ('0' + date.getDate())) + '/' + ((date.getMonth() > 8) ? (date.getMonth() + 1) : ('0' + (date.getMonth() + 1))) + '/' + date.getFullYear();
+  }
+  /** */
 }

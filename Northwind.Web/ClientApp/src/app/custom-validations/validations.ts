@@ -8,7 +8,7 @@ export function validatePostiveInteger(control: AbstractControl) {
 }
 
 export function validatePositiveDecimal(control: AbstractControl) {
-    if(control.value && control.value <= 0){
+    if(control.value && (control.value <= 0 || control.value > 100)){
         return { positiveDecimal: true }; 
     }
     return null;

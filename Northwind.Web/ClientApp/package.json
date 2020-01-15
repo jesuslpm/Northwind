@@ -24,6 +24,7 @@
     "@ng-select/ng-select": "^3.7.1",
     "@nguniversal/module-map-ngfactory-loader": "8.0.0-rc.1",
     "angular-datatables": "^8.0.0",
+    "angular-font-awesome": "^3.1.2",
     "aspnet-prerendering": "^3.0.1",
     "bootstrap": "^4.3.1",
     "core-js": "^2.6.5",

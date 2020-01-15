@@ -23,7 +23,8 @@ import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
-
+import { ExportService } from './services/export.service';
+import { FilterPipe } from './pipes/filter.pipe';
 @NgModule({
   declarations: [
     AppComponent,
@@ -31,7 +32,8 @@ import { PaginationModule } from 'ngx-bootstrap/pagination';
     HomeComponent,
     CatalogComponent,
     OrdersComponent,
-    ProductsComponent
+    ProductsComponent,
+    FilterPipe
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -54,6 +56,9 @@ import { PaginationModule } from 'ngx-bootstrap/pagination';
     TabsModule.forRoot(),
     PaginationModule.forRoot(),
   ],
+  exports: [
+    FilterPipe
+  ],
   providers: [
     CatalogClient,
     OrdersClient,
@@ -64,7 +69,8 @@ import { PaginationModule } from 'ngx-bootstrap/pagination';
       provide: HTTP_INTERCEPTORS,
       useClass: TokenInterceptor,
       multi: true
-    }
+    },
+    ExportService
   ],
   bootstrap: [AppComponent]
 })

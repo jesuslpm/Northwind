@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using inercya.EntityLite;
+using Newtonsoft.Json;
 
 namespace Northwind.Entities
 {
@@ -12,7 +13,11 @@ namespace Northwind.Entities
         public ICollection<string> CustomerIds { get; set; }
 
         public int? OrderId { get; set; }
-        public DateTime? OrderDateFrom { get; set; } 
+
+        [JsonConverter(typeof(RoundDateJsonConverter))]
+        public DateTime? OrderDateFrom { get; set; }
+
+        [JsonConverter(typeof(RoundDateJsonConverter))]
         public DateTime? OrderDateTo { get; set; }
         public ICollection<int?> EmployeeIds { get; set; }
 
@@ -24,11 +29,16 @@ namespace Northwind.Entities
 
         public decimal? OrderAmountTo { get; set; }
 
+        [JsonConverter(typeof(RoundDateJsonConverter))]
         public DateTime? RequiredDateFrom { get; set; }
+
+        [JsonConverter(typeof(RoundDateJsonConverter))]
         public DateTime? RequiredDateTo { get; set; }
 
+        [JsonConverter(typeof(RoundDateJsonConverter))]
         public DateTime? ShippedDateFrom { get; set; }
 
+        [JsonConverter(typeof(RoundDateJsonConverter))]
         public DateTime? ShippedDateTo { get; set; }
     }
 

@@ -26,7 +26,8 @@
 			new EntitySetting 
 			{
                 EntityName = "Order", 
-				BaseTableName = "Orders"
+				BaseTableName = "Orders",
+				RoundDateFields="OrderDate, RequiredDate, ShippedDate"
 			},
 			new EntitySetting 
 			{

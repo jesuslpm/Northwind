@@ -320,6 +320,8 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
         searchData.orderDateFrom = moment(this.searchForm.value.orderDateFrom).format("YYYY-MM-DD");
         //searchData.orderDateFrom = new Date(this.searchForm.value.orderDateFrom);
         searchData.orderDateFrom = new Date();
+
+        searchData.orderDateFrom = new Date((<Date>this.searchForm.value.orderDateFrom).setHours(0, 0, 0, 0));
         searchData.orderDateTo = searchData.orderDateFrom;
       } else {
         searchData.orderDateFrom =  null;
@@ -453,6 +455,9 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
     this.modalRef = this.modalService.show(template, {class: 'modal-lg right-side-modal product-modal big'});
   }
   onOrderDateFromChange(value: Date) {
+    console.log("Order Date From: %o", value);
+    var d = new Date(value.getTime() + value.getTimezoneOffset() * 60 * 1000);
+    console.log("Order date + timeoffset %o", d);
     // this.advanceSearchForm.patchValue({
     //   orderDateTo: ''
     // })

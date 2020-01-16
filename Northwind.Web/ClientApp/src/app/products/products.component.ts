@@ -1,11 +1,14 @@
 import { Component, OnInit, OnDestroy,AfterViewInit,ViewChild, TemplateRef  } from '@angular/core';
 import { CatalogClient, Product, Category, Supplier } from '../clients';
 import { Subject } from 'rxjs';
-import { DataTableDirective } from 'angular-datatables';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { ToastrService } from 'ngx-toastr';
 import * as moment from 'moment';
+import { DateService } from './../services/date.service';
+import { PaginationService } from './../services/pagination.service';
+import { ExportService } from '../services/export.service';
+import { FilterPipe } from '../pipes/filter.pipe';
 
 @Component({
   selector: 'app-products',
@@ -15,44 +18,36 @@ import * as moment from 'moment';
 export class ProductsComponent implements OnInit, OnDestroy,AfterViewInit {
 
   products: Product[] = [];
+  allProducts: Product[] = [];
   categories: Category[] = [];
   suppliers: Supplier[] = [];
-  dtOptions: any = {};
-  dtTrigger: any = new Subject();
-  @ViewChild(DataTableDirective,{static: false}) datatableElement: DataTableDirective;
   searchForm: FormGroup;
   productForm: FormGroup;
   modalRef: BsModalRef;
   currentProduct: Product;
 
+  perPageLimit = 10;
+  sortingColumn:string = "";
+  search:string = "";
+  pageWiseArray = [];
+  dataTableHeaders=['Product', 'Product Name', 'Supplier', 'Category',
+  'Unit Price $', 'Discontinued'];
+  dataColumns=['Product', 'Product Name', 'Supplier', 'Category',
+  'Unit Price $', 'Discontinued'];;
+
   constructor(
     private client: CatalogClient,
     private fb: FormBuilder,
     private modalService: BsModalService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private paginationService:PaginationService,
+    private dateService:DateService,
+    private exportService:ExportService,
+    public filterPipe:FilterPipe,
   ) { }
 
   ngOnInit() {
-    this.dtOptions = {
-      pagingType: 'full_numbers',
-      pageLength: 10,
-      dom: 'lBfrtip',
-      buttons: [
-        {
-          extend: 'excel',
-          text: 'Export to Excel',
-          exportOptions: {
-            columns: [ 0, 1,2,3,4,5]
-          },
-          filename: function(){
-            var d = new Date();
-            var n = d.getTime();
-            return 'Products-' + moment(d).format('DD-MM-YYYY-HH:mm:ss');
-          }
-        }
-      ],
-    };
-
+    
     this.getProducts();
     this.getCategories();
     this.getSuppliers();
@@ -70,11 +65,15 @@ export class ProductsComponent implements OnInit, OnDestroy,AfterViewInit {
       unitsInStock: [''],
       discontinued: [''],
     });
+
+    this.paginationService.currentMessage.subscribe((newData) =>{
+      this.pageWiseArray = newData
+    });
   }
 
   ngAfterViewInit(): void {
     const that = this;
-    $.fn['dataTable'].ext.search.push((settings, data, dataIndex) => {
+    /*$.fn['dataTable'].ext.search.push((settings, data, dataIndex) => {
       const supplierName = (data[2]);
       const categoryName = (data[3]);
       const formData = that.searchForm.value;
@@ -90,7 +89,7 @@ export class ProductsComponent implements OnInit, OnDestroy,AfterViewInit {
       } else {
         return false;
       }
-    });
+    });*/
   }
 
   getProducts() {
@@ -98,7 +97,14 @@ export class ProductsComponent implements OnInit, OnDestroy,AfterViewInit {
           .subscribe((products) => {
             if(products != null) {
               this.products = products;
-              this.dtTrigger.next();
+              let allProducts: any = products;
+              allProducts.filter(x => {
+                x.unitPrice = (x.unitPrice == null) ? 0.00 : x.unitPrice.toFixed(2);
+                x.unitPrice = "$ " + x.unitPrice;
+              })
+              this.products = allProducts;
+              this.allProducts= this.products;
+              this.paginationService.changePage(this.products);
             } else {
               this.toastr.error('Something went wrong!', 'Error!');      
             }
@@ -133,19 +139,10 @@ export class ProductsComponent implements OnInit, OnDestroy,AfterViewInit {
     });
   }
 
-  rerender(): void {
-    this.datatableElement.dtInstance.then((dtInstance: DataTables.Api) => {
-      // Destroy the table first
-      dtInstance.destroy();
-      // Call the dtTrigger to rerender again
-      this.dtTrigger.next();
-    });
-  }
-
-  filterData(): void {
-    this.datatableElement.dtInstance.then((dtInstance: DataTables.Api) => {
-      dtInstance.draw();
-    });
+  searchFilterData(): void {
+    // this.datatableElement.dtInstance.then((dtInstance: DataTables.Api) => {
+    //   dtInstance.draw();
+    // });
   }
 
   openProductModal(template: TemplateRef<any>, productId) {
@@ -170,9 +167,43 @@ export class ProductsComponent implements OnInit, OnDestroy,AfterViewInit {
       });
   }
 
+
+
+  //changePageLimit()
+  changePageLimit(){
+    this.paginationService.changePageLimit(this.perPageLimit, this.products)
+  }
+  // sortOrder() - Sort Orders according to column.
+  sortOrder(columnName: string) {
+    this.paginationService.sortOrder(columnName, this.products)
+  }
+  // pageChanged() - Event is fired when page is changed.
+  pageChanged(event) {
+    this.paginationService.pageChanged(event.page, this.products);
+  }
+
+
+  //exportToExcel => export Data to excel
+  exportToExcel(){
+    this.exportService.exportExcel(this.products,
+      this.dataTableHeaders,
+      this.dataColumns,
+      "Orders");
+  }
+
+  filterData() {
+    if(this.search){
+      this.products = this.filterPipe.transform(this.allProducts, this.dataColumns, this.search);
+    }else{
+      this.products = this.allProducts;
+    }
+    this.paginationService.changePage(this.products);
+    //this.changePage();
+    this.sortOrder(this.sortingColumn);
+  }
+
   ngOnDestroy(): void {
-    this.dtTrigger.unsubscribe();
-    $.fn['dataTable'].ext.search.pop();
+    this.paginationService.changePage([]);
   }
 
 }

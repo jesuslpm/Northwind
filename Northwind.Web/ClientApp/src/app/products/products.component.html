@@ -3,10 +3,10 @@
         <h2 class="card-title">Products</h2>
     </div>
     <div class="card-body position-relative">
-        <form [formGroup]="searchForm" (ngSubmit)="filterData()">
+        <form [formGroup]="searchForm" (ngSubmit)="searchFilterData()">
             <div class="row">
                 <div class="col-sm-4">
-                    <select id="supplier" name="supplier" formControlName="supplier" (change)="filterData()" class="form-control">
+                    <select id="supplier" name="supplier" formControlName="supplier" (change)="searchFilterData()" class="form-control">
                         <option value="">Select Supplier</option>
                         <option *ngFor="let supplier of suppliers;" [value]="supplier.companyName" [ngClass]="{active: (supplier.companyName == searchForm.value.supplier)}">
                             {{supplier.companyName}}
@@ -14,7 +14,7 @@
                     </select>
                 </div>
                 <div class="col-sm-4">
-                    <select id="category" name="category" formControlName="category" (change)="filterData()" class="form-control">
+                    <select id="category" name="category" formControlName="category" (change)="searchFilterData()" class="form-control">
                         <option value="">Select Category</option>
                         <option *ngFor="let category of categories;" [value]="category.categoryName" [ngClass]="{active: (category.categoryName == searchForm.value.category)}">
                             {{category.categoryName}}
@@ -24,33 +24,92 @@
             </div>
         </form>
         <br />
+        <div class="row">
+            <div class="col">
+                <div class="form-group d-flex align-items-center">
+                    <label class="d-flex align-items-center mb-0">
+                        show <select [(ngModel)]="perPageLimit" (change)="changePageLimit();" class="form-control w-auto mx-2">
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select> entries    
+                    </label>                    
+                    <button class='btn btn-primary ml-3' (click)="exportToExcel()">Export
+                        to
+                        Excel</button>
+                </div>
+
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="align-items-center d-flex form-group">                    
+                    <label class="mb-0 mr-2">Search: </label>
+                    <input class="form-control" [(ngModel)]="search"
+                        placeholder="" type="text"
+                        (keyup)="filterData();">
+                </div>
+            </div>
+        </div>
         <div class='table-outer'>
-        <table id="sample-table" datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border upgraded table-bordered hover">
-            <thead>
-                <tr>
-                    <th>Product</th>
-                    <th>Product Name</th>
-                    <th>Supplier</th>
-                    <th>Category</th>
-                    <th>Unit Price</th>
-                    <th>Discontinued</th>
-                    <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let p of products">
-                    <td class="text-right">{{p.productId}}</td>
-                    <td>{{p.productName}}</td>
-                    <td>{{p.suplierName}}</td>
-                    <td>{{p.categoryName}}</td>
-                    <td class="text-right">$ {{p.unitPrice | number : '1.2-2'}}</td>
-                    <td>{{(p.discontinued == true)?'Yes':'No'}}</td>
-                    <td>
-                        <button class='btn btn-primary' (click)="openProductModal(productTemplate,p.productId)">View</button>
-                    </td>
-                </tr>
-              </tbody>
-        </table>
+            <table id="sample-table-order" class="table table-striped upgraded">
+                <thead>
+                    <tr>
+                        <th class="crsr-pntr text-right" (click)="sortOrder('productId')">
+                            Product Id <i *ngIf="sortingColumn === 'productId'"
+                                class="fa {{sortType === '' || sortType === 'ASC' ? 'fa-sort-amount-asc' : 'fa-sort-amount-desc'}}"></i>
+                        </th>
+                        <th class="crsr-pntr" (click)="sortOrder('productName')">
+                            Product Name <i *ngIf="sortingColumn === 'productName'"
+                                class="fa {{sortType === '' || sortType === 'ASC' ? 'fa-sort-amount-asc' : 'fa-sort-amount-desc'}}"></i>
+                        </th>
+                        <th class="crsr-pntr" (click)="sortOrder('suplierName')">
+                            Supplier <i *ngIf="sortingColumn === 'suplierName'"
+                                class="fa {{sortType === '' || sortType === 'ASC' ? 'fa-sort-amount-asc' : 'fa-sort-amount-desc'}}"></i>
+                        </th>
+                        <th class="crsr-pntr" (click)="sortOrder('categoryName')">
+                            Category <i *ngIf="sortingColumn === 'categoryName'"
+                                class="fa {{sortType === '' || sortType === 'ASC' ? 'fa-sort-amount-asc' : 'fa-sort-amount-desc'}}"></i>
+                        </th>
+                        <th class="crsr-pntr text-right" (click)="sortOrder('unitPrice')">
+                            Unit Price <i *ngIf="sortingColumn === 'unitPrice'"
+                                class="fa {{sortType === '' || sortType === 'ASC' ? 'fa-sort-amount-asc' : 'fa-sort-amount-desc'}}"></i>
+                        </th>
+                        <th class="crsr-pntr" (click)="sortOrder('discontinued')">
+                            Discontinued <i *ngIf="sortingColumn === 'discontinued'"
+                                class="fa {{sortType === '' || sortType === 'ASC' ? 'fa-sort-amount-asc' : 'fa-sort-amount-desc'}}"></i>
+                        </th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody *ngIf="pageWiseArray && pageWiseArray.length > 0; else noTableData">
+                    <tr *ngFor="let product of pageWiseArray">
+                        <td class="text-right">{{product.productId}}</td>
+                        <td>{{product.productName}}</td>
+                        <td>{{product.suplierName}}</td>
+                        <td>{{product.categoryName}}</td>
+                        <td class="text-right">{{product.unitPrice}}</td>
+                        <td>{{(product.discontinued == true)?'Yes':'No'}}</td>
+                        <td>
+                            <button class='btn btn-primary' (click)="openProductModal(productTemplate,product.productId)">View</button>
+                        </td>
+                    </tr>
+                </tbody>
+                <ng-template #noTableData>
+                    <tbody>                         
+                        <tr>                           
+                            <td colspan="9" class="text-center">
+                                No data available
+                            </td>
+                        </tr>
+                    </tbody>                    
+                </ng-template>
+            </table>
+            <div class="row" *ngIf="products.length > 0">
+                <div class="rightAlign col-6" *ngIf="products.length > 0">
+                    <pagination [boundaryLinks]="true" [totalItems]="products.length" [itemsPerPage]="perPageLimit"
+                        [maxSize]="100" (pageChanged)="pageChanged($event)" class="pagination-sm w-100"></pagination>
+                </div>
+            </div>
         </div>
     </div>
 </div>

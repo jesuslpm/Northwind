@@ -65,7 +65,7 @@
                     <label class="mb-0 mr-2">Search: </label>
                     <input class="form-control" [(ngModel)]="search"
                         placeholder="" type="text"
-                        (keyup)="filterOrders();">
+                        (keyup)="filterData();">
                 </div>
             </div>
         </div>
@@ -108,30 +108,12 @@
                         <th>Action</th>
                     </tr>
                 </thead>
-                <!-- <tbody *ngIf="orders && orders.length > 0">
-                    <tr *ngFor="let o of orders">
-                        <td class="text-right">{{o.orderId}}</td>
-                        <td>{{o.customerName}}</td>
-                        <td>{{o.employeeFullName}}</td>
-                        <td>{{o.shipName}}</td>
-                        <td><span class='predate'>{{o.orderDate| date:'yyyy/MM/dd'}}</span>{{o.orderDate | date:'dd/MM/yyyy'}}</td>
-                        <td><span class='predate'>{{o.requiredDate| date:'yyyy/MM/dd'}}</span>{{o.requiredDate | date:'dd/MM/yyyy'}}</td>
-                        <td><span class='predate'>{{o.shippedDate| date:'yyyy/MM/dd'}}</span>{{o.shippedDate | date:'dd/MM/yyyy'}}</td>
-                        <td class="text-right">$ {{o.orderTotal | number : '1.2-2'}}</td>
-                        <td>
-                            <button class='btn btn-primary' (click)="openOrderModal(createOrderTemplate, true, o.orderId)">Edit</button>
-                        </td>
-                    </tr>
-                </tbody> -->
                 <tbody *ngIf="pageWiseArray && pageWiseArray.length > 0; else noTableData">
                     <tr *ngFor="let order of pageWiseArray">
                         <td class="text-right">{{order.orderId}}</td>
                         <td>{{order.customerName}}</td>
                         <td>{{order.employeeFullName}}</td>
                         <td>{{order.shipName}}</td>
-                        <!-- <td>{{order.orderDate | date:'dd/MM/yyyy'}}</td>
-                        <td>{{order.requiredDate | date:'dd/MM/yyyy'}}</td>
-                        <td>{{order.shippedDate | date:'dd/MM/yyyy'}}</td> -->
                         <td>{{order.orderDate}}</td>
                         <td>{{order.requiredDate}}</td>
                         <td>{{order.shippedDate}}</td>
@@ -154,10 +136,10 @@
                 </ng-template>
             </table>
             <div class="row" *ngIf="orders.length > 0">
-            <div class="rightAlign col-6" *ngIf="orders.length > 0">
-                <pagination [boundaryLinks]="true" [totalItems]="orders.length" [itemsPerPage]="perPageLimit"
-                    [maxSize]="100" (pageChanged)="pageChanged($event)" class="pagination-sm w-100"></pagination>
-            </div>
+                <div class="rightAlign col-6" *ngIf="orders.length > 0">
+                    <pagination [boundaryLinks]="true" [totalItems]="orders.length" [itemsPerPage]="perPageLimit"
+                        [maxSize]="100" (pageChanged)="pageChanged($event)" class="pagination-sm w-100"></pagination>
+                </div>
             </div>
         </div>
     </div>
@@ -641,13 +623,13 @@
                         </div>
                     </div>
                 </tab>
-                <tab id="tab2" *ngIf="orderEditMode" heading="Orders from the same customer" (selectTab)="onSelect($event)">
+                <tab id="tab2" heading="Orders from the same customer" (selectTab)="onSelect($event)">
                     <div class="inner-tab">
                         <table *ngIf="orderFromSameCustomer && orderFromSameCustomer.length > 0" id="table-order-detail"
                             class="row-border hover fs-14 fs-14-table light-border table">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
+                                    <th>Order Id</th>
                                     <th>Employee</th>
                                     <th>Shipper</th>
                                     <th>Order Date</th>
@@ -660,7 +642,7 @@
                                 <tr *ngFor="let order of orderFromSameCustomer;let idx = index">
                                     <td>{{order.orderId}}</td>
                                     <td>{{order.employeeFullName}}</td>
-                                    <td>{{order.shipName}}</td>
+                                    <td>{{order.shipper}}</td>
                                     <td>{{order.orderDate}}</td>
                                     <td>{{order.requiredDate}}</td>
                                     <td>{{order.shippedDate}}</td>
@@ -678,8 +660,10 @@
                     <label>Total Order: $ {{netTotal | number : '1.2-2'}}</label>
                 </div>
                 <div class="col text-right">
-                    <button type="button" class="btn btn-primary" (click)="onSubmitOrder()"
+                    <button *ngIf="!orderEditMode" type="button" class="btn btn-primary" (click)="onSubmitOrder()"
                         [disabled]="orderProducts && orderProducts.length == 0">Save Data</button>
+                    <button *ngIf="orderEditMode" type="button" class="btn btn-primary" (click)="onSubmitOrder()"
+                        [disabled]="orderProducts && orderProducts.length == 0">Update Data</button>
                 </div>
             </div>
         </div>

@@ -15,7 +15,6 @@ import { OrdersComponent } from './orders/orders.component';
 import { CatalogClient, OrdersClient,CustomersClient, EmployeesClient, ShippersClient} from './clients';
 import { ProductsComponent } from './products/products.component';
 import { ReactiveFormsModule } from '@angular/forms';
-import { DataTablesModule } from 'angular-datatables';
 import { ToastrModule } from 'ngx-toastr';
 import { BlockUIModule } from 'ng-block-ui';
 import { ModalModule } from 'ngx-bootstrap/modal';
@@ -25,6 +24,8 @@ import { TabsModule } from 'ngx-bootstrap/tabs';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { ExportService } from './services/export.service';
 import { FilterPipe } from './pipes/filter.pipe';
+import { DateService } from './services/date.service';
+import { PaginationService } from './services/pagination.service';
 @NgModule({
   declarations: [
     AppComponent,
@@ -45,7 +46,6 @@ import { FilterPipe } from './pipes/filter.pipe';
       { path: 'orders', component: OrdersComponent },
       { path: 'products', component: ProductsComponent }
     ]),
-    DataTablesModule,
     ReactiveFormsModule,
     BrowserAnimationsModule,
     ToastrModule.forRoot(),
@@ -70,7 +70,9 @@ import { FilterPipe } from './pipes/filter.pipe';
       useClass: TokenInterceptor,
       multi: true
     },
-    ExportService
+    ExportService,
+    DateService,
+    PaginationService
   ],
   bootstrap: [AppComponent]
 })

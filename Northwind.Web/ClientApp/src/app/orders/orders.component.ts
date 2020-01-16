@@ -1,5 +1,6 @@
+import { DateService } from './../services/date.service';
+import { PaginationService } from './../services/pagination.service';
 import { Component, OnInit, OnDestroy,AfterViewInit,ViewChild, TemplateRef  } from '@angular/core';
-
 import { CatalogClient, Product, 
   Category, Supplier, 
   OrdersClient, Order,CustomersClient, Customer, 
@@ -7,7 +8,6 @@ import { CatalogClient, Product,
 } from '../clients';
 
 import { Subject } from 'rxjs';
-import { DataTableDirective } from 'angular-datatables';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { BsModalService, BsModalRef, ModalDirective } from 'ngx-bootstrap/modal';
 import { ToastrService } from 'ngx-toastr';
@@ -39,9 +39,7 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
   employeesArray = [];
   shippers: Shipper[] = [];
   shippersArray = [];
-  dtOptions: any = {};
-  dtTrigger: any = new Subject();
-  @ViewChild(DataTableDirective,{static: false}) datatableElement: DataTableDirective;
+
 
   searchForm: FormGroup;
   advanceSearchForm: FormGroup;
@@ -65,12 +63,13 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
   currentOrderProducts: Product[] = [];
 
   /* New table */
-  pageNumber = 1;
-  perPageLimit = 10;
+  /*pageNumber = 1;
   pageWiseArray = [];
+  sortType:string = "";*/
+  perPageLimit = 10;
   sortingColumn:string = "";
-  sortType:string = "";
   search:string = "";
+  pageWiseArray = [];
   dataTableHeaders=['Order Id', 'Customer Name', 'Employee', 'Shipper',
   'Order Date', 'Required Date', 'Shipped Date', 'Order Total $'];
   dataColumns=['orderId', 'customerName', 'employeeFullName', 'shipName',
@@ -86,33 +85,14 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
     private modalService: BsModalService,
     private toastr: ToastrService,
     private exportService:ExportService,
-    public filterPipe:FilterPipe
+    public filterPipe:FilterPipe,
+    private paginationService:PaginationService,
+    private dateService:DateService,
+    
   ) { }
 
   ngOnInit() {
-      this.dtOptions = {
-          pagingType: 'full_numbers',
-          pageLength: 10,
-          dom: 'lBfrtip',
-          buttons: [
-            {
-              extend: 'excel',
-              text: 'Export to Excel',
-              exportOptions: {
-                columns: [ 0, 1,2,3,4,5,6,7] //Your Colume value those you want
-              },
-              filename: function(){
-                var d = new Date();
-                var n = d.getTime();
-                return 'Orders-' + moment(d).format('DD-MM-YYYY-HH:mm:ss');
-              }
-            }
-          ],
-          // "ordering": false
-          // "columnDefs": [
-          //   { "visible": false, "targets": 0 }
-          // ]
-      };
+      
       this.getCustomers();
       this.getProducts();
       this.getCategories();
@@ -165,15 +145,19 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
         quantity: ['', [Validators.required, validatePostiveInteger]],
         discount: ['',[validatePositiveDecimal]]
       });
+
+      this.paginationService.changePage(this.orders);
+      this.paginationService.currentMessage.subscribe((newData) =>{
+        this.pageWiseArray = newData
+      });
   }
 
   ngAfterViewInit(): void {
-    this.dtTrigger.next();
+    
   }
 
   ngOnDestroy(): void {
-    this.dtTrigger.unsubscribe();
-    $.fn['dataTable'].ext.search.pop();
+    
   }
 
   /*getOrders(loadFirstTime = false) {
@@ -181,7 +165,6 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
           .subscribe((orders) => {
             if(orders != null) {
               this.orders = orders;
-              this.dtTrigger.next();
             } else {
               this.toastr.error('Something went wrong!', 'Error!');      
             }
@@ -297,14 +280,6 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
-  rerender(): void {
-    this.datatableElement.dtInstance.then((dtInstance: DataTables.Api) => {
-      // Destroy the table first
-      dtInstance.destroy();
-      // Call the dtTrigger to rerender again
-     this.dtTrigger.next();
-    });
-  }
 
   searchFormSubmit() {
     if(this.searchForm.valid) {
@@ -348,15 +323,16 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
             if(orders != null) {
               let allOrders: any = orders;
               allOrders.filter(x => {
-                x.orderDate = this.formatDate(x.orderDate);
-                x.requiredDate = this.formatDate(x.requiredDate);
-                x.shippedDate = this.formatDate(x.shippedDate);
+                x.orderDate = this.dateService.formatDate(x.orderDate);
+                x.requiredDate = this.dateService.formatDate(x.requiredDate);
+                x.shippedDate = this.dateService.formatDate(x.shippedDate);
                 x.orderTotal = (x.orderTotal == null) ? 0.00 : x.orderTotal.toFixed(2);
                 x.orderTotal = "$ " + x.orderTotal;
               })
               this.orders = allOrders;
               this.allOrders = this.orders;
-              this.changePage();
+              this.paginationService.changePage(this.orders);
+              //this.changePage();
             } else {
               this.toastr.error('Something went wrong!', 'Error!');      
             }
@@ -438,15 +414,17 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
             if(orders != null) {
               let allOrders: any = orders;
               allOrders.filter(x => {
-                x.orderDate = this.formatDate(x.orderDate);
-                x.requiredDate = this.formatDate(x.requiredDate);
-                x.shippedDate = this.formatDate(x.shippedDate);
+                x.orderDate = this.dateService.formatDate(x.orderDate);
+                x.requiredDate = this.dateService.formatDate(x.requiredDate);
+                x.shippedDate = this.dateService.formatDate(x.shippedDate);
                 x.orderTotal = (x.orderTotal == null) ? 0.00 : x.orderTotal.toFixed(2);
                 x.orderTotal = "$ " + x.orderTotal;
               })
               this.orders = allOrders;
               this.allOrders = this.orders;
-              this.changePage();
+              
+              this.paginationService.changePage(this.orders);
+              //this.changePage();
               this.modalRef.hide();
             } else {
               this.toastr.error('Something went wrong!', 'Error!');      
@@ -717,6 +695,9 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
         this.calculateNetTotal();
         this.productForm.reset();
         this.productEditMode = false;
+        var valuesA = this.products.reduce(function(a,c){a[c.productId] = c.productId; return a; }, {});
+        var valuesB = this.orderProducts.reduce(function(a,c){a[c.productId] = c.productId; return a; }, {});
+        this.currentOrderProducts = this.products.filter(function(c){ return !valuesB[c.productId]}).concat(this.orderProducts.filter(function(c){ return !valuesA[c.productId]}));
         Swal.fire(
           'Deleted!',
           'Product has been deleted.',
@@ -744,8 +725,7 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
         this.ordersClient.saveWholeOrder(orderData)
           .subscribe((res) => {
             if(res != null) {
-              this.toastr.success('Order updated successfully!', 'Success!');  
-              //this.rerender();
+              this.toastr.success('Order updated successfully!', 'Success!');
               this.modalRef.hide();
               this.clearModalData();
               this.searchFormSubmit();
@@ -854,7 +834,7 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
 
   /* new table*/
   // changePage() - Display records according to page.
-   changePage(){
+  /*changePage(){
     this.pageWiseArray = [];
     for(let j=((this.perPageLimit * this.pageNumber) - this.perPageLimit); 
             j<(this.perPageLimit * this.pageNumber); 
@@ -869,8 +849,7 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
     this.changePage();
   }
 
-
-  // sortUser() - Sort Orders according to column.
+  // sortOrder() - Sort Orders according to column.
   sortOrder(columnName: string) {
     if (!this.sortingColumn || this.sortingColumn != columnName) {
       this.sortType = "ASC";
@@ -886,12 +865,29 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
     this.changePage();
   }
 
-
-    // pageChanged() - Event is fired when page is changed.
+  // pageChanged() - Event is fired when page is changed.
   pageChanged(event) {
+    console.log('event',event.page)
     this.pageNumber = event.page;
     this.changePage();
+  }*/
+
+
+
+  
+  //changePageLimit()
+  changePageLimit(){
+    this.paginationService.changePageLimit(this.perPageLimit, this.orders)
   }
+  // sortOrder() - Sort Orders according to column.
+  sortOrder(columnName: string) {
+    this.paginationService.sortOrder(columnName, this.orders)
+  }
+  // pageChanged() - Event is fired when page is changed.
+  pageChanged(event) {
+    this.paginationService.pageChanged(event.page, this.orders);
+  }
+
 
   //exportToExcel => export Data to excel
   exportToExcel(){
@@ -901,20 +897,21 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
       "Orders");
   }
 
-  filterOrders(){
+  filterData(){
     if(this.search){
       this.orders = this.filterPipe.transform(this.allOrders, this.dataColumns, this.search);
     }else{
       this.orders = this.allOrders;
     }
-    this.changePage();
+    this.paginationService.changePage(this.orders);
+    //this.changePage();
     this.sortOrder(this.sortingColumn);
   }
 
-  formatDate(dateString: any){
+  /*formatDate(dateString: any){
     var date = new Date(dateString);
     return  ((date.getDate() > 9) ? date.getDate() : ('0' + date.getDate())) + '/' + ((date.getMonth() > 8) ? (date.getMonth() + 1) : ('0' + (date.getMonth() + 1))) + '/' + date.getFullYear();
-  }
+  }*/
   /** */
 
   onSelect(data: TabDirective): void {
@@ -926,9 +923,9 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
             console.log('orders', orders);
             let allOrders: any = orders;
             allOrders.filter(x => {
-              x.orderDate = this.formatDate(x.orderDate);
-              x.requiredDate = this.formatDate(x.requiredDate);
-              x.shippedDate = this.formatDate(x.shippedDate);
+              x.orderDate = this.dateService.formatDate(x.orderDate);
+              x.requiredDate = this.dateService.formatDate(x.requiredDate);
+              x.shippedDate = this.dateService.formatDate(x.shippedDate);
               x.orderTotal = (x.orderTotal == null) ? 0.00 : x.orderTotal.toFixed(2);
               x.orderTotal = "$ " + x.orderTotal;
             })

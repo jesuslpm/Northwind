@@ -22,7 +22,7 @@ export class CatalogClient {
 
     constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
         this.http = http;
-        this.baseUrl = baseUrl ? baseUrl : "";
+        this.baseUrl = baseUrl ? baseUrl : "http://192.168.1.173";
     }
 
     /**
@@ -241,7 +241,7 @@ export class CustomersClient {
 
     constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
         this.http = http;
-        this.baseUrl = baseUrl ? baseUrl : "";
+        this.baseUrl = baseUrl ? baseUrl : "http://192.168.1.173";
     }
 
     /**
@@ -359,7 +359,7 @@ export class EmployeesClient {
 
     constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
         this.http = http;
-        this.baseUrl = baseUrl ? baseUrl : "";
+        this.baseUrl = baseUrl ? baseUrl : "http://192.168.1.173";
     }
 
     /**
@@ -422,7 +422,7 @@ export class OrdersClient {
 
     constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
         this.http = http;
-        this.baseUrl = baseUrl ? baseUrl : "";
+        this.baseUrl = baseUrl ? baseUrl : "http://192.168.1.173";
     }
 
     /**
@@ -654,7 +654,7 @@ export class ShippersClient {
 
     constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
         this.http = http;
-        this.baseUrl = baseUrl ? baseUrl : "";
+        this.baseUrl = baseUrl ? baseUrl : "http://192.168.1.173";
     }
 
     /**
@@ -717,7 +717,7 @@ export class WeatherForecastClient {
 
     constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
         this.http = http;
-        this.baseUrl = baseUrl ? baseUrl : "";
+        this.baseUrl = baseUrl ? baseUrl : "http://192.168.1.173";
     }
 
     get(): Observable<WeatherForecast[]> {
@@ -850,6 +850,7 @@ export interface Order {
     shipTitle?: string | undefined;
     shipPhone?: string | undefined;
     shipFax?: string | undefined;
+    shipper?: string | undefined;
     customerName?: string | undefined;
     details?: OrderDetail[] | undefined;
     employeeFullName?: string | undefined;

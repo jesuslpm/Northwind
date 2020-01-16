@@ -366,7 +366,7 @@ export class DashboardClient {
      * Returns an order including its order details
      * @return an order
      */
-    getOrderInfosByDate(dashboardCriteria: DashboardCriteria): Observable<OrderInfo[]> {
+    getOrderInfosByDate(dashboardCriteria: DashboardCriteria): Observable<DashboardEntity> {
         let url_ = this.baseUrl + "/dashboard";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -389,14 +389,14 @@ export class DashboardClient {
                 try {
                     return this.processGetOrderInfosByDate(<any>response_);
                 } catch (e) {
-                    return <Observable<OrderInfo[]>><any>_observableThrow(e);
+                    return <Observable<DashboardEntity>><any>_observableThrow(e);
                 }
             } else
-                return <Observable<OrderInfo[]>><any>_observableThrow(response_);
+                return <Observable<DashboardEntity>><any>_observableThrow(response_);
         }));
     }
 
-    protected processGetOrderInfosByDate(response: HttpResponseBase): Observable<OrderInfo[]> {
+    protected processGetOrderInfosByDate(response: HttpResponseBase): Observable<DashboardEntity> {
         const status = response.status;
         const responseBlob = 
             response instanceof HttpResponse ? response.body : 
@@ -406,7 +406,7 @@ export class DashboardClient {
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
-            result200 = _responseText === "" ? null : <OrderInfo[]>JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = _responseText === "" ? null : <DashboardEntity>JSON.parse(_responseText, this.jsonParseReviver);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -414,7 +414,7 @@ export class DashboardClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<OrderInfo[]>(<any>null);
+        return _observableOf<DashboardEntity>(<any>null);
     }
 }
 
@@ -889,12 +889,19 @@ export interface Customer {
     fax?: string | undefined;
 }
 
-export interface OrderInfo {
-    orderId?: number | undefined;
-    orderDetailId: number;
+export interface DashboardEntity {
+    orderInfoCountries?: OrderInfoCountry[] | undefined;
+    orderInfoCategories?: OrderInfoCategory[] | undefined;
+}
+
+export interface OrderInfoCountry {
     quantity: number;
-    orderDate?: Date | undefined;
     shipCountry?: string | undefined;
+    orderDetailAmount?: number | undefined;
+}
+
+export interface OrderInfoCategory {
+    quantity: number;
     orderDetailAmount?: number | undefined;
     categoryName?: string | undefined;
 }

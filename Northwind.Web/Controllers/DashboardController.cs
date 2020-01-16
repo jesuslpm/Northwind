@@ -25,13 +25,40 @@ namespace Northwind.Web.Controllers
         /// </summary>
         /// <returns>an order</returns> 
         [HttpGet("")]
-        [ProducesResponseType(typeof(IList<Entities.OrderInfo>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(DashboardEntity), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetOrderInfosByDate(DashboardCriteria dashboardCriteria)
         {
+
+            DashboardEntity dashboardEntity = new DashboardEntity();
             var orderInfos = await dataService.OrderInfoRepository.SearchQuery(dashboardCriteria)
                 .OrderByDesc(nameof(Order.OrderId))
                 .ToListAsync();
-            return Ok(orderInfos);
+
+
+            dashboardEntity.orderInfoCategories = orderInfos
+            .GroupBy(x => x.CategoryName)
+            .Select(x => new OrderInfoCategory()
+            {
+                Quantity = x.Sum(c => c.Quantity),
+                OrderDetailAmount = x.Sum(c => c.OrderDetailAmount),
+                CategoryName = x.First().CategoryName
+            }).ToList();
+
+
+            dashboardEntity.orderInfoCountries = orderInfos
+            .GroupBy(x => x.ShipCountry)
+            .Select(x => new OrderInfoCountry()
+            {
+
+                Quantity = x.Sum(c => c.Quantity),
+                OrderDetailAmount = x.Sum(c => c.OrderDetailAmount),
+                ShipCountry = x.First().ShipCountry
+
+            }).ToList();
+           
+            return Ok(dashboardEntity);
         }
+
+
     }
 }

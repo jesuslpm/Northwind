@@ -179,10 +179,7 @@
             "x-nullable": false,
             "description": "an order",
             "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/OrderInfo"
-              }
+              "$ref": "#/definitions/DashboardEntity"
             }
           }
         }
@@ -547,30 +544,51 @@
         }
       }
     },
-    "OrderInfo": {
+    "DashboardEntity": {
+      "type": "object",
+      "properties": {
+        "orderInfoCountries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/OrderInfoCountry"
+          }
+        },
+        "orderInfoCategories": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/OrderInfoCategory"
+          }
+        }
+      }
+    },
+    "OrderInfoCountry": {
       "type": "object",
       "required": [
-        "orderDetailId",
         "quantity"
       ],
       "properties": {
-        "orderId": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "orderDetailId": {
-          "type": "integer",
-          "format": "int32"
-        },
         "quantity": {
-          "type": "integer"
-        },
-        "orderDate": {
-          "type": "string",
-          "format": "date-time"
+          "type": "integer",
+          "format": "int32"
         },
         "shipCountry": {
           "type": "string"
+        },
+        "orderDetailAmount": {
+          "type": "number",
+          "format": "decimal"
+        }
+      }
+    },
+    "OrderInfoCategory": {
+      "type": "object",
+      "required": [
+        "quantity"
+      ],
+      "properties": {
+        "quantity": {
+          "type": "integer",
+          "format": "int32"
         },
         "orderDetailAmount": {
           "type": "number",

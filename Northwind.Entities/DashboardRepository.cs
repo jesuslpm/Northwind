@@ -15,8 +15,53 @@ namespace Northwind.Entities
         [JsonConverter(typeof(RoundDateJsonConverter))]
         public DateTime? DateTo { get; set; }
     }
+    
+	public class DashboardEntity
+	{
+		public List<OrderInfoCountry> orderInfoCountries { get; set; }
 
-    public partial class OrderInfoRepository
+		public List<OrderInfoCategory> orderInfoCategories { get; set; }
+	}
+    public class OrderInfoCountry
+    {
+		public Int32 Quantity
+		{
+			get;set;
+			
+		}
+		public String ShipCountry
+		{
+			get;set;
+			
+		}
+		public Decimal? OrderDetailAmount
+		{
+			get;set;
+		}
+		
+	}
+
+	public class OrderInfoCategory
+	{
+		public Int32 Quantity
+		{
+			get; set;
+
+		}
+
+		public Decimal? OrderDetailAmount
+		{
+			get; set;
+		}
+
+		public String CategoryName
+		{
+			get;
+			set;
+		}
+	}
+
+	public partial class OrderInfoRepository
     {
         public IQueryLite<OrderInfo> SearchQuery(DashboardCriteria criteria)
         {

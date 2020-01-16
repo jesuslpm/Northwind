@@ -18,6 +18,9 @@ export class PaginationService {
   search:string = "";
   changePage(data){
     this.pageWiseArray = [];
+    if(data.length == 0) {
+      this.messageSource.next(this.pageWiseArray)
+    }
     for(let j=((this.perPageLimit * this.pageNumber) - this.perPageLimit); 
             j<(this.perPageLimit * this.pageNumber); 
             j++){
@@ -56,7 +59,6 @@ export class PaginationService {
     // pageChanged() - Event is fired when page is changed.
   pageChanged(page, data) {
     this.pageNumber = page;
-    console.log('in service page', this.pageNumber);
     this.changePage(data);
   }
 }

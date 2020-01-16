@@ -26,14 +26,14 @@ export class ProductsComponent implements OnInit, OnDestroy,AfterViewInit {
   modalRef: BsModalRef;
   currentProduct: Product;
 
+  search:string = "";
   perPageLimit = 10;
   sortingColumn:string = "";
-  search:string = "";
   pageWiseArray = [];
   dataTableHeaders=['Product', 'Product Name', 'Supplier', 'Category',
   'Unit Price $', 'Discontinued'];
-  dataColumns=['Product', 'Product Name', 'Supplier', 'Category',
-  'Unit Price $', 'Discontinued'];;
+  dataColumns=['productId', 'productName', 'suplierName', 'categoryName',
+  'unitPrice', 'discontinued'];;
 
   constructor(
     private client: CatalogClient,
@@ -143,6 +143,33 @@ export class ProductsComponent implements OnInit, OnDestroy,AfterViewInit {
     // this.datatableElement.dtInstance.then((dtInstance: DataTables.Api) => {
     //   dtInstance.draw();
     // });
+    const formData = this.searchForm.value;
+    
+
+    if((formData.supplier === '' && formData.category == '')) {
+      this.products = this.allProducts;
+    } else if(((formData.supplier != '')) && (formData.category == '')) {
+      this.products = this.filterPipe.transform(this.allProducts, ['suplierName'], formData.supplier);
+    } else if(((formData.category != '')) && (formData.supplier == '')) {
+      this.products = this.filterPipe.transform(this.allProducts, ['categoryName'], formData.category);
+    } else if (((formData.supplier !='')) && ((formData.category !=''))) {
+      let filteredSuppliers = this.filterPipe.transform(this.allProducts, ['suplierName'], formData.supplier);
+      
+      this.products = this.filterPipe.transform(filteredSuppliers, ['categoryName'], formData.category);
+      console.log('products',this.products);
+      if(this.products.length == 0){
+        this.paginationService.changePage("");
+      } else {
+        this.paginationService.changePage(this.products);
+      }
+      
+    } else {
+      this.products = this.allProducts;
+    }
+
+    
+    this.paginationService.changePage(this.products);
+    this.sortOrder(this.sortingColumn);
   }
 
   openProductModal(template: TemplateRef<any>, productId) {
@@ -198,7 +225,6 @@ export class ProductsComponent implements OnInit, OnDestroy,AfterViewInit {
       this.products = this.allProducts;
     }
     this.paginationService.changePage(this.products);
-    //this.changePage();
     this.sortOrder(this.sortingColumn);
   }
 

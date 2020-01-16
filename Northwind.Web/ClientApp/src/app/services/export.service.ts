@@ -3,8 +3,6 @@ import { Injectable } from '@angular/core';
 const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
 //const EXCEL_TYPE = 'application/vnd.ms-excel';
 
-
-
 @Injectable({
   providedIn: 'root'
 })

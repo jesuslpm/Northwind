@@ -61,7 +61,7 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
   orderEditMode: Boolean = false;
   productEditMode: Boolean = false;
   currentOrderProducts: Product[] = [];
-
+  existProduct:Boolean = false;
   /* New table */
   /*pageNumber = 1;
   pageWiseArray = [];
@@ -146,14 +146,14 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
         discount: ['',[validatePositiveDecimal]]
       });
 
-      this.paginationService.changePage(this.orders);
       this.paginationService.currentMessage.subscribe((newData) =>{
         this.pageWiseArray = newData
       });
+      
   }
 
   ngAfterViewInit(): void {
-    
+    this.pageWiseArray = [];  
   }
 
   ngOnDestroy(): void {
@@ -595,7 +595,7 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
 
   openOrderModal(template: TemplateRef<any>,isEdit=false, orderId=0) {
     this.orderEditMode = isEdit;
-    //this.clearModalData();
+    this.clearModalData();
     if(isEdit) {
       this.ordersClient.getWholeOrder(orderId)
         .subscribe((order) => {
@@ -620,10 +620,10 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
             });
             this.orderProducts = order.details;
             this.netTotal = order.orderTotal;
-
-            var valuesA = this.products.reduce(function(a,c){a[c.productId] = c.productId; return a; }, {});
+            this.getSameCustomerOrders(order.customerId);
+           /* var valuesA = this.products.reduce(function(a,c){a[c.productId] = c.productId; return a; }, {});
             var valuesB = this.orderProducts.reduce(function(a,c){a[c.productId] = c.productId; return a; }, {});
-            this.currentOrderProducts = this.products.filter(function(c){ return !valuesB[c.productId]}).concat(this.orderProducts.filter(function(c){ return !valuesA[c.productId]}));
+            this.currentOrderProducts = this.products.filter(function(c){ return !valuesB[c.productId]}).concat(this.orderProducts.filter(function(c){ return !valuesA[c.productId]}));*/
           } else {
             this.toastr.error('Something went wrong!', 'Error!');      
           }
@@ -634,9 +634,11 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
     this.modalRef = this.modalService.show(template, {class: 'modal-xlg right-side-modal product-modal big', animated: true});
   }
 
-  getCustomerInfo() {
+  onChangeCustomer() {
     let customerId = this.orderForm.value.customerId;
+    this.orderFromSameCustomer = [];
     if(customerId != "") {
+      this.getSameCustomerOrders(customerId);
       this.customerClient.customerById(customerId)
         .subscribe((customer) => {
           if(customer != null) {
@@ -673,6 +675,14 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
     } else {
       productDetails.discount = ''
     }
+
+    //first remove data from orderProducts then add that product to product list
+    /*this.orderProducts.splice(idx,1);
+    var valuesA = this.products.reduce(function(a,c){a[c.productId] = c.productId; return a; }, {});
+    var valuesB = this.orderProducts.reduce(function(a,c){a[c.productId] = c.productId; return a; }, {});
+    this.currentOrderProducts = this.products.filter(function(c){ return !valuesB[c.productId]}).concat(this.orderProducts.filter(function(c){ return !valuesA[c.productId]}));
+    this.calculateNetTotal();*/
+
     this.productForm.patchValue({
       productId:productDetails.productId,
       quantity: productDetails.quantity,
@@ -694,10 +704,11 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
         this.orderProducts.splice(idx,1);
         this.calculateNetTotal();
         this.productForm.reset();
+        this.existProduct = false;
         this.productEditMode = false;
-        var valuesA = this.products.reduce(function(a,c){a[c.productId] = c.productId; return a; }, {});
+        /*var valuesA = this.products.reduce(function(a,c){a[c.productId] = c.productId; return a; }, {});
         var valuesB = this.orderProducts.reduce(function(a,c){a[c.productId] = c.productId; return a; }, {});
-        this.currentOrderProducts = this.products.filter(function(c){ return !valuesB[c.productId]}).concat(this.orderProducts.filter(function(c){ return !valuesA[c.productId]}));
+        this.currentOrderProducts = this.products.filter(function(c){ return !valuesB[c.productId]}).concat(this.orderProducts.filter(function(c){ return !valuesA[c.productId]}));*/
         Swal.fire(
           'Deleted!',
           'Product has been deleted.',
@@ -759,10 +770,12 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
     this.isOrderFormSubmitted = false;
     this.orderForm.reset();
     this.productForm.reset();
+    this.existProduct = false;
     this.orderProducts = [];
     this.netTotal = 0;
     this.isOrderFormSubmitted = false;
     this.isProductFormSubmitted = false;
+    this.orderFromSameCustomer = [];
   }
 
   calculateNetTotal() {
@@ -814,21 +827,35 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
               this.currentOrderProducts.splice(usedProductIndex,1);*/
 
 
-              var valuesA = this.products.reduce(function(a,c){a[c.productId] = c.productId; return a; }, {});
+              /*var valuesA = this.products.reduce(function(a,c){a[c.productId] = c.productId; return a; }, {});
               var valuesB = this.orderProducts.reduce(function(a,c){a[c.productId] = c.productId; return a; }, {});
-              this.currentOrderProducts = this.products.filter(function(c){ return !valuesB[c.productId]}).concat(this.orderProducts.filter(function(c){ return !valuesA[c.productId]}));
+              this.currentOrderProducts = this.products.filter(function(c){ return !valuesB[c.productId]}).concat(this.orderProducts.filter(function(c){ return !valuesA[c.productId]}));*/
               
               this.calculateNetTotal();
               this.productForm.reset();
+              this.existProduct = false;
               this.isProductFormSubmitted = false;
 
-              
+              console.log('this.orderProducts.',this.orderProducts);
             } else {
               this.toastr.error('Something went wrong!', 'Error!');      
             }
         },(err) => {
           this.toastr.error('Something went wrong!', 'Error!');
         });
+    }
+  }
+
+
+  currentOrderProductChange() {
+    let selectedProduct = +this.productForm.value.productId;
+    let existProductArray = this.orderProducts.filter(function(product, i){
+      return (product.productId === selectedProduct)
+    });
+    if(existProductArray.length > 0){
+      this.existProduct = true;
+    } else {
+      this.existProduct = false;
     }
   }
 
@@ -916,26 +943,30 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
 
   onSelect(data: TabDirective): void {
     if(data.id == "tab2") {
-      // call api for orders from same customer
-      this.ordersClient.getOrdersByCustID(this.currentOrder.customerId)
-        .subscribe((orders) => {
-          if(orders != null) {
-            console.log('orders', orders);
-            let allOrders: any = orders;
-            allOrders.filter(x => {
-              x.orderDate = this.dateService.formatDate(x.orderDate);
-              x.requiredDate = this.dateService.formatDate(x.requiredDate);
-              x.shippedDate = this.dateService.formatDate(x.shippedDate);
-              x.orderTotal = (x.orderTotal == null) ? 0.00 : x.orderTotal.toFixed(2);
-              x.orderTotal = "$ " + x.orderTotal;
-            })
-            this.orderFromSameCustomer = allOrders;
-          } else {
-            this.toastr.error('Something went wrong!', 'Error!');      
-          }
-      },(err) => {
-        this.toastr.error('Something went wrong!', 'Error!');
-      });
+      
     }
+  }
+
+  getSameCustomerOrders(customerId) {
+    // call api for orders from same customer
+    this.ordersClient.getOrdersByCustID(customerId)
+      .subscribe((orders) => {
+        if(orders != null) {
+          console.log('orders', orders);
+          let allOrders: any = orders;
+          allOrders.filter(x => {
+            x.orderDate = this.dateService.formatDate(x.orderDate);
+            x.requiredDate = this.dateService.formatDate(x.requiredDate);
+            x.shippedDate = this.dateService.formatDate(x.shippedDate);
+            x.orderTotal = (x.orderTotal == null) ? 0.00 : x.orderTotal.toFixed(2);
+            x.orderTotal = "$ " + x.orderTotal;
+          })
+          this.orderFromSameCustomer = allOrders;
+        } else {
+          this.toastr.error('Something went wrong!', 'Error!');      
+        }
+    },(err) => {
+      this.toastr.error('Something went wrong!', 'Error!');
+    });
   }
 }

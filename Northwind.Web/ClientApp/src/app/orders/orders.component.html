@@ -389,7 +389,7 @@
                                 class="required">*</span></label>
                         <div class="col-sm-10">
                             <select id="customerId" name="customerId" formControlName="customerId" class="form-control"
-                                (change)="getCustomerInfo()" placeholder="Select Customer">
+                                (change)="onChangeCustomer()" placeholder="Select Customer">
                                 <option value=""> Select Customer</option>
                                 <option *ngFor="let customer of customers;" [value]="customer.customerId">
                                     {{customer.contactName}}
@@ -548,16 +548,19 @@
                                     <div class="d-flex white-label">
                                         <label for="productId" class="">Product<span class="required">*</span></label>
                                         <div class="px-3">
-                                            <select id="product" name="productId" formControlName="productId"
-                                                class="form-control">
+                                            <select id="product" name="productId" formControlName="productId" class="form-control" (change)="currentOrderProductChange()">
                                                 <option value="">Select Product</option>
-                                                <option *ngFor="let product of currentOrderProducts;" [value]="product.productId">
+                                                <option *ngFor="let product of products;" [value]="product.productId">
                                                     {{product.productName}}
                                                 </option>
                                             </select>
                                             <div *ngIf="isProductFormSubmitted && productForm.controls.productId?.errors?.required"
                                                 class="validation-error">
                                                 This field is required
+                                            </div>
+                                            <div *ngIf="isProductFormSubmitted && (!productForm.controls.productId?.errors?.required && existProduct)"
+                                                class="validation-error">
+                                                This product is already exist
                                             </div>
                                         </div>
                                         <label for="quantity" class="">Quantity<span class="required">*</span></label>

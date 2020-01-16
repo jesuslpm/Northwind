@@ -352,6 +352,73 @@ export class CustomersClient {
 }
 
 @Injectable()
+export class DashboardClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ? baseUrl : "";
+    }
+
+    /**
+     * Returns an order including its order details
+     * @return an order
+     */
+    getOrderInfosByDate(dashboardCriteria: DashboardCriteria): Observable<OrderInfo[]> {
+        let url_ = this.baseUrl + "/dashboard";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(dashboardCriteria);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",			
+            headers: new HttpHeaders({
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetOrderInfosByDate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetOrderInfosByDate(<any>response_);
+                } catch (e) {
+                    return <Observable<OrderInfo[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<OrderInfo[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetOrderInfosByDate(response: HttpResponseBase): Observable<OrderInfo[]> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : <OrderInfo[]>JSON.parse(_responseText, this.jsonParseReviver);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<OrderInfo[]>(<any>null);
+    }
+}
+
+@Injectable()
 export class EmployeesClient {
     private http: HttpClient;
     private baseUrl: string;
@@ -820,6 +887,21 @@ export interface Customer {
     country?: string | undefined;
     phone?: string | undefined;
     fax?: string | undefined;
+}
+
+export interface OrderInfo {
+    orderId?: number | undefined;
+    orderDetailId: number;
+    quantity: number;
+    orderDate?: Date | undefined;
+    shipCountry?: string | undefined;
+    orderDetailAmount?: number | undefined;
+    categoryName?: string | undefined;
+}
+
+export interface DashboardCriteria {
+    dateFrom?: Date | undefined;
+    dateTo?: Date | undefined;
 }
 
 export interface EmployeeMinimal {

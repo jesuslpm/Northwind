@@ -586,6 +586,18 @@ namespace Northwind.Entities
 			}
         }
 
+		private String _shipper;
+		[DataMember]
+		[SqlField(DbType.String, 40, ColumnName ="Shipper" )]		
+		public String Shipper 
+		{ 
+		    get { return _shipper; } 
+			set 
+			{
+			    _shipper = value;
+			}
+        }
+
 		private String _customerName;
 		[DataMember]
 		[SqlField(DbType.String, 30, ColumnName ="CustomerName" )]		
@@ -600,7 +612,7 @@ namespace Northwind.Entities
 
 		public const string BaseTableProjectionColumnList = "[OrderID], [CustomerID], [EmployeeID], [OrderDate], [RequiredDate], [ShippedDate], [ShipVia], [Freight], [ShipName], [ShipAddress], [ShipCity], [ShipRegion], [ShipPostalCode], [ShipCountry]";
 		public const string BasicProjectionColumnList = "[OrderID], [CustomerID], [EmployeeID], [OrderDate], [RequiredDate], [ShippedDate], [ShipVia], [Freight], [ShipName], [ShipAddress], [ShipCity], [ShipRegion], [ShipPostalCode], [ShipCountry], [CustomerCompanyName], [EmployeeFirstName], [EmployeeLastName], [ShipperCompanyName], [OrderTotal], [ShipTitle], [ShipPhone], [ShipFax]";
-		public const string WithTotalProjectionColumnList = "[OrderID], [CustomerID], [EmployeeID], [OrderDate], [RequiredDate], [ShippedDate], [ShipVia], [Freight], [ShipName], [ShipAddress], [ShipCity], [ShipRegion], [ShipPostalCode], [ShipCountry], [CustomerName], [EmployeeFirstName], [EmployeeLastName], [OrderTotal]";
+		public const string WithTotalProjectionColumnList = "[OrderID], [CustomerID], [EmployeeID], [OrderDate], [RequiredDate], [ShippedDate], [ShipVia], [Shipper], [Freight], [ShipName], [ShipAddress], [ShipCity], [ShipRegion], [ShipPostalCode], [ShipCountry], [CustomerName], [EmployeeFirstName], [EmployeeLastName], [OrderTotal]";
 
 	}
 
@@ -715,6 +727,7 @@ namespace Northwind.Entities
 		public const string ShipTitle = "ShipTitle";
 		public const string ShipPhone = "ShipPhone";
 		public const string ShipFax = "ShipFax";
+		public const string Shipper = "Shipper";
 		public const string CustomerName = "CustomerName";
 	}
 
@@ -2082,6 +2095,128 @@ namespace Northwind.Entities
 	{
 		public const string BaseTable = "BaseTable";
 	}
+	[Serializable]
+	[DataContract]
+	[SqlEntity()]
+	public partial class OrderInfo
+	{
+		private Int32? _orderId;
+		[DataMember]
+		[SqlField(DbType.Int32, 4, Precision = 10, IsKey=true, AllowNull = true, ColumnName ="OrderId" )]		
+		public Int32? OrderId 
+		{ 
+		    get { return _orderId; } 
+			set 
+			{
+			    _orderId = value;
+			}
+        }
+
+		private Int32 _orderDetailId;
+		[DataMember]
+		[SqlField(DbType.Int32, 4, Precision = 10, IsKey=true, ColumnName ="OrderDetailID" )]		
+		public Int32 OrderDetailId 
+		{ 
+		    get { return _orderDetailId; } 
+			set 
+			{
+			    _orderDetailId = value;
+			}
+        }
+
+		private Int16 _quantity;
+		[DataMember]
+		[SqlField(DbType.Int16, 2, Precision = 5, ColumnName ="Quantity" )]		
+		public Int16 Quantity 
+		{ 
+		    get { return _quantity; } 
+			set 
+			{
+			    _quantity = value;
+			}
+        }
+
+		private DateTime? _orderDate;
+		[DataMember]
+		[SqlField(DbType.DateTime, 8, Precision = 23, Scale=3, AllowNull = true, ColumnName ="OrderDate" )]		
+		public DateTime? OrderDate 
+		{ 
+		    get { return _orderDate; } 
+			set 
+			{
+			    _orderDate = value;
+			}
+        }
+
+		private String _shipCountry;
+		[DataMember]
+		[SqlField(DbType.String, 15, ColumnName ="ShipCountry" )]		
+		public String ShipCountry 
+		{ 
+		    get { return _shipCountry; } 
+			set 
+			{
+			    _shipCountry = value;
+			}
+        }
+
+		private Decimal? _orderDetailAmount;
+		[DataMember]
+		[SqlField(DbType.Currency, 8, Precision = 19, AllowNull = true, IsReadOnly = true, ColumnName ="OrderDetailAmount" )]		
+		public Decimal? OrderDetailAmount 
+		{ 
+		    get { return _orderDetailAmount; } 
+			set 
+			{
+			    _orderDetailAmount = value;
+			}
+        }
+
+		private String _categoryName;
+		[DataMember]
+		[SqlField(DbType.String, 15, ColumnName ="CategoryName" )]		
+		public String CategoryName 
+		{ 
+		    get { return _categoryName; } 
+			set 
+			{
+			    _categoryName = value;
+			}
+        }
+
+		public const string DashboardProjectionColumnList = "[OrderId], [OrderDetailID], [Quantity], [OrderDate], [ShipCountry], [OrderDetailAmount], [CategoryName]";
+
+	}
+
+	public partial class OrderInfoRepository : Repository<OrderInfo> 
+	{
+		public OrderInfoRepository(DataService DataService) : base(DataService)
+		{
+		}
+
+		public new NorthwindDataService  DataService  
+		{
+			get { return (NorthwindDataService) base.DataService; }
+			set { base.DataService = value; }
+		}
+
+	}
+	[Obsolete("Use nameof instead")]
+	public static partial class OrderInfoFields
+	{
+		public const string OrderId = "OrderId";
+		public const string OrderDetailId = "OrderDetailId";
+		public const string Quantity = "Quantity";
+		public const string OrderDate = "OrderDate";
+		public const string ShipCountry = "ShipCountry";
+		public const string OrderDetailAmount = "OrderDetailAmount";
+		public const string CategoryName = "CategoryName";
+	}
+
+	public static partial class OrderInfoProjections
+	{
+		public const string Dashboard = "Dashboard";
+	}
 }
 
 namespace Northwind.Entities
@@ -2214,6 +2349,19 @@ namespace Northwind.Entities
 					_SupplierRepository = new Northwind.Entities.SupplierRepository(this);
 				}
 				return _SupplierRepository;
+			}
+		}
+
+		private Northwind.Entities.OrderInfoRepository _OrderInfoRepository;
+		public Northwind.Entities.OrderInfoRepository OrderInfoRepository
+		{
+			get 
+			{
+				if ( _OrderInfoRepository == null)
+				{
+					_OrderInfoRepository = new Northwind.Entities.OrderInfoRepository(this);
+				}
+				return _OrderInfoRepository;
 			}
 		}
 	}

@@ -27,7 +27,10 @@ namespace Northwind.Web.Controllers
         [ProducesResponseType(typeof(IList<Entities.EmployeeMinimal>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllEmployees()
         {
-            var employees = await dataService.EmployeeRepository.Query(EmployeeProjections.Minimal).ToListAsync();
+            var employees = await dataService.EmployeeRepository
+                .Query(EmployeeProjections.Minimal)
+                .OrderBy(nameof(Employee.FirstName))
+                .ToListAsync();
             return Ok(employees.Select(x => new EmployeeMinimal() {EmployeeId = x.EmployeeId, EmployeeFullName=x.EmployeeFullName }));
 
 

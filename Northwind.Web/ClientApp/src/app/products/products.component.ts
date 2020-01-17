@@ -4,7 +4,6 @@ import { Subject } from 'rxjs';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { ToastrService } from 'ngx-toastr';
-import * as moment from 'moment';
 import { DateService } from './../services/date.service';
 import { PaginationService } from './../services/pagination.service';
 import { ExportService } from '../services/export.service';

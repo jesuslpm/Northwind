@@ -11,7 +11,6 @@ import { Subject } from 'rxjs';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { BsModalService, BsModalRef, ModalDirective } from 'ngx-bootstrap/modal';
 import { ToastrService } from 'ngx-toastr';
-import * as moment from 'moment';
 import Swal from 'sweetalert2';
 import { validatePostiveInteger, validatePositiveDecimal } from '../custom-validations/validations';
 import { ExportService } from '../services/export.service';
@@ -297,27 +296,13 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
       }
       
       if(this.searchForm.value.orderDateFrom != null) {
-        //searchData.orderDateFrom = moment(this.searchForm.value.orderDateFrom).format("YYYY-MM-DD");
-        //searchData.orderDateFrom = new Date(this.searchForm.value.orderDateFrom);
-        //searchData.orderDateFrom = new Date();
-
         searchData.orderDateFrom = new Date((<Date>this.searchForm.value.orderDateFrom).setHours(0, 0, 0, 0));
         searchData.orderDateTo = searchData.orderDateFrom;
       } else {
         searchData.orderDateFrom =  null;
         searchData.orderDateTo =  null;
       }
-      
-     /* searchData.employeeIds = [];
-      searchData.shipperIds = [];
-      searchData.productIds= [];
-      searchData.orderAmountFrom =  null;
-      searchData.orderAmountTo = null;
-      searchData.requiredDateFrom = null;
-      searchData.requiredDateTo = null;
-      searchData.shippedDateFrom = null;
-      searchData.shippedDateTo  = null;*/
-
+     
       this.ordersClient.search(searchData)
           .subscribe(orders => {
             if(orders != null) {
@@ -350,27 +335,21 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
       let searchData:OrderCriteria = {};
       searchData = this.advanceSearchForm.value;
       if(searchData.orderDateFrom != null){
-        //searchData.orderDateFrom = moment(searchData.orderDateFrom).format("YYYY-MM-DD");
         searchData.orderDateFrom = new Date((<Date>searchData.orderDateFrom).setHours(0, 0, 0, 0));
       }
       if(searchData.orderDateTo != null){
-        //searchData.orderDateTo = moment(searchData.orderDateTo).format("YYYY-MM-DD");
         searchData.orderDateTo = new Date((<Date>searchData.orderDateTo).setHours(0, 0, 0, 0));
       }
       if(searchData.requiredDateFrom != null){
-        //searchData.requiredDateFrom = moment(searchData.requiredDateFrom).format("YYYY-MM-DD");
         searchData.requiredDateFrom = new Date((<Date>searchData.requiredDateFrom).setHours(0, 0, 0, 0));
       }
       if(searchData.requiredDateTo != null){
-        //searchData.requiredDateTo = moment(searchData.requiredDateTo).format("YYYY-MM-DD");
         searchData.requiredDateTo = new Date((<Date>searchData.requiredDateTo).setHours(0, 0, 0, 0));
       }
       if(searchData.shippedDateFrom != null){
-        //searchData.shippedDateFrom = moment(searchData.shippedDateFrom).format("YYYY-MM-DD");
         searchData.shippedDateFrom = new Date((<Date>searchData.shippedDateFrom).setHours(0, 0, 0, 0));
       }
       if(searchData.shippedDateTo != null) {
-        //searchData.shippedDateTo = moment(searchData.shippedDateTo).format("YYYY-MM-DD");
         searchData.shippedDateTo = new Date((<Date>searchData.shippedDateTo).setHours(0, 0, 0, 0));
       }
 
@@ -727,7 +706,6 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
 
       orderData.employeeId = +orderData.employeeId;
       orderData.shipVia = +orderData.shipVia;
-      //orderData.orderDate = moment().format('YYYY-MM-DD');
       orderData.orderDate = new Date();
       
       // add order
@@ -787,7 +765,7 @@ export class OrdersComponent implements OnInit, OnDestroy, AfterViewInit {
 
   onAddProduct() {
     this.isProductFormSubmitted = true;
-    if(this.productForm.valid) {
+    if(this.productForm.valid && !this.existProduct) {
       let productId = this.productForm.value.productId;
       //orderProducts
       this.client.getProductById(productId)

@@ -1,0 +1,128 @@
+<div class="card upgraded mb-4 mb-md-5">    
+    <div class="card-header">
+        <h2 class="card-title">Dashboard</h2>
+    </div>
+    <div class="row container dashboard-filter-outer">
+        <div class="col-sm-2">
+            <button class="btn btn-primary" (click)="thisMonth()">This Month</button>
+        </div>
+        <div class="col-sm-2">
+            <button class="btn btn-primary" (click)="lastMonth()">Last Month</button>
+        </div>
+        <div class="col-sm-2">
+            <button class="btn btn-primary" (click)="thisQuater()">This Quater</button>
+        </div>
+        <div class="col-sm-2">
+            <button class="btn btn-primary" (click)="lastQuater()">Last Quater</button>
+        </div>
+        <div class="col-sm-2">
+            <button class="btn btn-primary" (click)="thisYear()">This Year</button>
+        </div>
+        <form class="form-horizontal col-sm-2" [formGroup]="searchForm" (ngSubmit)="searchSubmit()">
+            <!-- <div class="form-group col-sm-12">
+                <div class="row">
+                    <label for="categoryId" class="col-sm-3 col-form-label">Order Date</label>
+                    <div class="col-sm-1">
+                        <label for="categoryId" class="col-form-label">From</label>
+                    </div>
+                    <div class="col-sm-3">
+                        <input type="text" placeholder="DD/MM/YYYY" formControlName="orderDateFrom"
+                            class="form-control" bsDatepicker
+                            [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', adaptivePosition: true }"
+                            (bsValueChange)="onOrderDateFromChange($event)">
+                        <div *ngIf="searchForm.controls.orderDateFrom?.errors?.required"
+                            class="validation-error">
+                            This field is required
+                        </div>
+                    </div>
+                    <div class="col-sm-1">
+                        <label for="categoryId" class="col-form-label">To</label>
+                    </div>
+                    <div class="col-sm-3">
+                        <input type="text" placeholder="DD/MM/YYYY" formControlName="orderDateTo"
+                            class="form-control" bsDatepicker
+                            [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', adaptivePosition: true }"
+                            (bsValueChange)="onOrderDateToChange($event)" [minDate]="minOrderDateTo"
+                            [isDisabled]="isDisabledOrderDateTo">
+                        <div *ngIf="searchForm.controls.orderDateTo?.errors?.required"
+                            class="validation-error">
+                            This field is required
+                        </div>
+                    </div>
+                </div>
+            </div> -->
+            <div class="form-group">
+                <input class="form-control" #drp="bsDaterangepicker" formControlName="dateRange" bsDaterangepicker [bsConfig]="{ rangeInputFormat: 'DD/MM/YYYY', adaptivePosition: true }" (ngModelChange)='dateRangeChange()' [maxDate]="lastDay">
+            </div>
+        </form>
+    </div>
+    <div class="card-body position-relative">
+        <div class="row">
+            <div class="col-md-6">
+                <div>
+                    <h6 class="text-center">Country Wise Turnover (Quantity)</h6>
+                </div>
+                <div class="chart" id="country">
+                    <canvas baseChart
+                    [datasets]="countryQtyChartData"
+                    [labels]="countryQtyChartLabel"
+                    [options]="barChartOptions"
+                    [plugins]="barChartPlugins"
+                    [legend]="barChartLegend"
+                    [chartType]="barChartType">
+                  </canvas>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div>
+                    <h6 class="text-center">Country Wise Turnover (Amount)</h6>
+                </div>
+                <div class="chart" id="category">
+                    <canvas baseChart
+                    [datasets]="countryAmountChartData"
+                    [labels]="countryAmountChartLabel"
+                    [options]="barChartOptions"
+                    [plugins]="barChartPlugins"
+                    [legend]="barChartLegend"
+                    [chartType]="barChartType">
+                    </canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" style="margin-top:80px;">
+            <div class="col-md-6">
+                <div>
+                    <h6 class="text-center">Category Wise Turnover (Quantity)</h6>
+                </div>
+                <div class="chart" id="country">
+                    <canvas baseChart
+                    [datasets]="categoryQtyChartData"
+                    [labels]="categoryQtyChartLabel"
+                    [options]="barChartOptions"
+                    [plugins]="barChartPlugins"
+                    [legend]="barChartLegend"
+                    [chartType]="barChartType"
+                    [colors]="barChartColors">
+                  </canvas>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div>
+                    <h6 class="text-center">Category Wise Turnover (Amount)</h6>
+                </div>
+                <div class="chart" id="category">
+                    <canvas baseChart
+                    [datasets]="categoryAmountChartData"
+                    [labels]="categoryAmountChartLabel"
+                    [options]="barChartOptions"
+                    [plugins]="barChartPlugins"
+                    [legend]="barChartLegend"
+                    [chartType]="barChartType"
+                    [colors]="barChartColors">
+                    </canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

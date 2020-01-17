@@ -12,7 +12,7 @@ import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { HomeComponent } from './home/home.component';
 import { CatalogComponent } from './catalog/catalog.component';
 import { OrdersComponent } from './orders/orders.component';
-import { CatalogClient, OrdersClient,CustomersClient, EmployeesClient, ShippersClient} from './clients';
+import { CatalogClient, OrdersClient,CustomersClient, EmployeesClient, ShippersClient ,DashboardClient} from './clients';
 import { ProductsComponent } from './products/products.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ToastrModule } from 'ngx-toastr';
@@ -26,6 +26,8 @@ import { ExportService } from './services/export.service';
 import { FilterPipe } from './pipes/filter.pipe';
 import { DateService } from './services/date.service';
 import { PaginationService } from './services/pagination.service';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { ChartsModule } from 'ng2-charts';
 @NgModule({
   declarations: [
     AppComponent,
@@ -34,14 +36,16 @@ import { PaginationService } from './services/pagination.service';
     CatalogComponent,
     OrdersComponent,
     ProductsComponent,
-    FilterPipe
+    FilterPipe,
+    DashboardComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
     HttpClientModule,
     FormsModule,
     RouterModule.forRoot([
-      { path: '', component: HomeComponent, pathMatch: 'full' },
+      { path: '', component: DashboardComponent, pathMatch: 'full' },
+      { path: 'dashboard', component: DashboardComponent, pathMatch: 'full' },
       { path: 'catalog', component: CatalogComponent },
       { path: 'orders', component: OrdersComponent },
       { path: 'products', component: ProductsComponent }
@@ -55,6 +59,7 @@ import { PaginationService } from './services/pagination.service';
     NgSelectModule,
     TabsModule.forRoot(),
     PaginationModule.forRoot(),
+    ChartsModule
   ],
   exports: [
     FilterPipe
@@ -65,6 +70,7 @@ import { PaginationService } from './services/pagination.service';
     EmployeesClient,
     CustomersClient,
     ShippersClient,
+    DashboardClient,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: TokenInterceptor,

@@ -384,3 +384,10 @@ th.crsr-pntr {
 .nav-item.active a{
   color: #000000;
 }
+
+.dashboard-filter-outer {
+  font-size: 14px;
+  font-weight: normal;
+  margin-top: 14px;
+  text-align: center;
+}

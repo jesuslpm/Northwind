@@ -24,7 +24,7 @@ namespace Northwind.Web.Controllers
         /// Returns an order including its order details
         /// </summary>
         /// <returns>an order</returns> 
-        [HttpGet("")]
+        [HttpPost("")]
         [ProducesResponseType(typeof(DashboardEntity), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetOrderInfosByDate(DashboardCriteria dashboardCriteria)
         {

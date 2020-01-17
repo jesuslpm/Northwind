@@ -58,6 +58,10 @@
 			{
                 EntityName = "Supplier", 
 				BaseTableName = "Suppliers"
+			},
+			new EntitySetting 
+			{
+                EntityName = "OrderInfo"
 			}
 		},
 		ProcedureSettings = new List<ProcedureSetting>

@@ -26,7 +26,10 @@ namespace Northwind.Web.Controllers
         [ProducesResponseType(typeof(IList<Shipper>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllShippers()
         {
-            var customers = await dataService.ShipperRepository.Query(ShipperProjections.BaseTable).ToListAsync();
+            var customers = await dataService.ShipperRepository
+                .Query(ShipperProjections.BaseTable)
+                .OrderBy(nameof(Shipper.CompanyName))
+                .ToListAsync();
             return Ok(customers);
         }
     }

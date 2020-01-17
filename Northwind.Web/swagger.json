@@ -150,6 +150,41 @@
         }
       }
     },
+    "/dashboard": {
+      "post": {
+        "tags": [
+          "Dashboard"
+        ],
+        "summary": "Returns an order including its order details",
+        "operationId": "Dashboard_GetOrderInfosByDate",
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "parameters": [
+          {
+            "name": "dashboardCriteria",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/DashboardCriteria"
+            },
+            "x-nullable": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "x-nullable": false,
+            "description": "an order",
+            "schema": {
+              "$ref": "#/definitions/DashboardEntity"
+            }
+          }
+        }
+      }
+    },
     "/employees/getallemployees": {
       "get": {
         "tags": [
@@ -509,6 +544,74 @@
         }
       }
     },
+    "DashboardEntity": {
+      "type": "object",
+      "properties": {
+        "orderInfoCountries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/OrderInfoCountry"
+          }
+        },
+        "orderInfoCategories": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/OrderInfoCategory"
+          }
+        }
+      }
+    },
+    "OrderInfoCountry": {
+      "type": "object",
+      "required": [
+        "quantity"
+      ],
+      "properties": {
+        "quantity": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "shipCountry": {
+          "type": "string"
+        },
+        "orderDetailAmount": {
+          "type": "number",
+          "format": "decimal"
+        }
+      }
+    },
+    "OrderInfoCategory": {
+      "type": "object",
+      "required": [
+        "quantity"
+      ],
+      "properties": {
+        "quantity": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "orderDetailAmount": {
+          "type": "number",
+          "format": "decimal"
+        },
+        "categoryName": {
+          "type": "string"
+        }
+      }
+    },
+    "DashboardCriteria": {
+      "type": "object",
+      "properties": {
+        "dateFrom": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "dateTo": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
     "EmployeeMinimal": {
       "type": "object",
       "required": [
@@ -602,6 +705,9 @@
           "type": "string"
         },
         "shipFax": {
+          "type": "string"
+        },
+        "shipper": {
           "type": "string"
         },
         "customerName": {

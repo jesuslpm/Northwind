@@ -123,12 +123,10 @@ export class DashboardComponent implements OnInit {
   }
 
   searchSubmit(dateFrom, dateTo) {
-    console.log('search form', this.searchForm.value);
     let searchData:DashboardCriteria = {};
     searchData.dateFrom = dateFrom;
     searchData.dateTo = dateTo;
-    console.log('searchData',searchData);
-
+    
     this.dashboardClient.getOrderInfosByDate(searchData)
           .subscribe((res) => {
             if(res != null) {
@@ -190,7 +188,6 @@ export class DashboardComponent implements OnInit {
   }
 
   dateRangeChange() {
-    console.log('dateRangeChange');
     let searchData:any = {};
     let rangeData = this.searchForm.value.dateRange;
     if(rangeData && rangeData.length > 0){

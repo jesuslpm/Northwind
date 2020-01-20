@@ -391,3 +391,7 @@ th.crsr-pntr {
   margin-top: 14px;
   text-align: center;
 }
+
+.block-ui-wrapper {
+  background: rgba(0, 0, 0, 0.33) !important;
+}

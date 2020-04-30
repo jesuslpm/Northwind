@@ -33,7 +33,7 @@
     "datatables.net-buttons-dt": "^1.6.1",
     "datatables.net-dt": "^1.10.20",
     "font-awesome": "^4.7.0",
-    "jquery": "3.4.1",
+    "jquery": "3.5.0",
     "ng-block-ui": "^2.1.8",
     "ng2-charts": "^2.3.0",
     "ngx-bootstrap": "^5.2.0",
